@@ -20,7 +20,7 @@
       ]
     },
     "rootDir": ".",
-    "outDir": "../../../../Desktop/ngx-pica/dist",
+    "outDir": "dist",
     "sourceMap": true,
     "inlineSources": true,
     "target": "es5",
