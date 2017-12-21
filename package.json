@@ -1,0 +1,44 @@
+{
+  "name": "ngx-pica",
+  "version": "1.0.0",
+  "description": "Simple Angular 5 wrapper for pica to resize images in browser",
+  "main": "index.js",
+  "scripts": {
+    "transpile": "ngc",
+    "package": "rollup -c",
+    "minify": "uglifyjs dist/bundles/ngx-pica.umd.js --screw-ie8 --compress --mangle --comments --output dist/bundles/ngx-pica.umd.min.js",
+    "build": "npm run transpile && npm run package && npm run minify"
+  },
+  "author": "Digital Ascetic",
+  "license": "MIT",
+  "keywords": [
+    "angular5",
+    "pica",
+    "image",
+    "resize"
+  ],
+  "dependencies": {
+    "pica": "^4.0.1"
+  },
+  "peerDependencies": {
+    "@angular/core": "^5.1.2",
+    "@angular/common": "^5.1.2",
+    "@angular/platform-browser": "^5.1.2",
+    "rxjs": "^5.5.2"
+  },
+  "devDependencies": {
+    "@angular/common": "^5.1.2",
+    "@angular/compiler": "^5.1.2",
+    "@angular/compiler-cli": "^5.1.2",
+    "@angular/core": "^5.1.2",
+    "@angular/platform-browser": "^5.1.2",
+    "@types/node": "^8.5.2",
+    "core-js": "^2.5.3",
+    "tslint": "~5.7.0",
+    "typescript": "~2.4.2",
+    "rollup": "^0.52.3",
+    "rxjs": "^5.5.2",
+    "uglify-js": "^3.2.2",
+    "zone.js": "^0.8.14"
+  }
+}
