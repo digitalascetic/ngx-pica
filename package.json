@@ -40,5 +40,10 @@
     "rxjs": "^5.5.2",
     "uglify-js": "^3.2.2",
     "zone.js": "^0.8.14"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/digitalascetic/ngx-pica.git"
+  },
+  "homepage": "https://github.com/digitalascetic/ngx-pica#readme"
 }
