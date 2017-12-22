@@ -1,7 +1,8 @@
 import {Injectable} from '@angular/core';
-import pica from 'pica/dist/pica';
 import {Subject} from 'rxjs/Subject';
 import {Observable} from 'rxjs/Observable';
+import {Subscription} from 'rxjs/Subscription';
+import pica from 'pica/dist/pica';
 
 declare let window: any;
 
@@ -13,12 +14,31 @@ export class NgxPicaService {
         const resizedImage: Subject<File> = new Subject();
         const totalFiles: number = files.length;
 
-        for (let i = 0; i < totalFiles; i++) {
-            this.resizeImage(files[i], width, height, keepAspectRatio).subscribe(imageResized => {
-                resizedImage.next(imageResized);
-            }, (err) => {
-                resizedImage.error(err);
+        if (totalFiles > 0) {
+            const nextFile: Subject<File> = new Subject();
+            let index: number = 0;
+
+            const subscription: Subscription = nextFile.subscribe((file: File) => {
+                this.resizeImage(file, width, height, keepAspectRatio).subscribe(imageResized => {
+                    index++;
+                    resizedImage.next(imageResized);
+
+                    if (index < totalFiles) {
+                        nextFile.next(files[index]);
+
+                    } else {
+                        resizedImage.complete();
+                        subscription.unsubscribe();
+                    }
+                }, (err) => {
+                    resizedImage.error(err);
+                });
             });
+
+            nextFile.next(files[index]);
+        } else {
+            resizedImage.error('NO_FILES_RECEIVED');
+            resizedImage.complete();
         }
 
         return resizedImage.asObservable();
@@ -58,6 +78,7 @@ export class NgxPicaService {
                     .catch((err) => resizedImage.error(err))
                     .then((resizedCanvas: HTMLCanvasElement) => resizer.toBlob(resizedCanvas, file.type))
                     .then((blob: Blob) => {
+                        window.URL.revokeObjectURL(img.src);
                         let fileResized: File = this.generateResultFile(blob, file.name, file.type, new Date().getTime());
                         resizedImage.next(fileResized);
                     });
@@ -65,24 +86,14 @@ export class NgxPicaService {
 
             img.src = window.URL.createObjectURL(file);
         } else {
-            resizedImage.error('Canvas context identifier is not supported.');
+            resizedImage.error('CANVAS_CONTEXT_IDENTIFIER_NOT_SUPPORTED');
         }
 
         return resizedImage.asObservable();
     }
 
     private generateResultFile(blob: Blob, name: string, type: string, lastModified: number): File {
-        let resultFile = new Blob([blob], {type: type});
-        return this.blobToFile(resultFile, name, lastModified);
-    }
-
-    private blobToFile(blob: Blob, name: string, lastModified: number): File {
-        let file: any = blob;
-        file.name = name;
-        file.lastModified = lastModified;
-
-        //Cast to a File() type
-        return <File> file;
+        return new File([blob], name, {type: type, lastModified: lastModified});
     }
 
 }

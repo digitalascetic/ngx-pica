@@ -1,6 +1,6 @@
 {
   "name": "ngx-pica",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Simple Angular 5 wrapper for pica to resize images in browser",
   "main": "index.js",
   "scripts": {
