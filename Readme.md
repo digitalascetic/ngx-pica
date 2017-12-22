@@ -31,8 +31,18 @@ This method resize an array of images doing it sequentially to optimize CPU and 
 The Observable receives a next on every file that has been resized.
 If something goes wrong the Observable receive an error.
 
+All errors are wrapped by NgxPicaErrorInterface.
+
 ### `.resizeImage(file: File, width: number, height: number, keepAspectRatio: boolean = false): Observable<File>`
 Same as above but only takes one file instead of an array of files.
+
+## Data Structures
+```
+export interface NgxPicaErrorInterface {
+    err: any;
+    file?: File;
+}
+```
 
 ## Example
 
@@ -70,8 +80,8 @@ export class AppHomeComponent {
                 
                 reader.readAsDataURL(imageResized);
                 
-            }, (err) => {
-                throw err;
+            }, (err: NgxPicaErrorInterface) => {
+                throw err.err;
             });
     }
 ```  

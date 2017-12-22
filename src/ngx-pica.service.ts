@@ -3,6 +3,7 @@ import {Subject} from 'rxjs/Subject';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
 import pica from 'pica/dist/pica';
+import {NgxPicaErrorInterface} from './ngx-pica-error.interface';
 
 declare let window: any;
 
@@ -31,13 +32,22 @@ export class NgxPicaService {
                         subscription.unsubscribe();
                     }
                 }, (err) => {
-                    resizedImage.error(err);
+                    const ngxPicaError: NgxPicaErrorInterface = {
+                        file: file,
+                        err: err
+                    };
+
+                    resizedImage.error(ngxPicaError);
                 });
             });
 
             nextFile.next(files[index]);
         } else {
-            resizedImage.error('NO_FILES_RECEIVED');
+            const ngxPicaError: NgxPicaErrorInterface = {
+                err: 'NO_FILES_RECEIVED'
+            };
+
+            resizedImage.error(ngxPicaError);
             resizedImage.complete();
         }
 
