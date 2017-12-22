@@ -39,7 +39,7 @@ Same as above but only takes one file instead of an array of files.
 
 ```ts
 import { Component, EventEmitter } from '@angular/core';
-import { UploadOutput, UploadInput, UploadFile, humanizeBytes, UploaderOptions } from 'ngx-pica';
+import { NgxPicaService } from 'ngx-pica';
 
 @Component({
   selector: 'app-home',
