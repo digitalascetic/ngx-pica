@@ -25,18 +25,41 @@ export class AppModule {}
 ```
 
 ## Methods
-### `.resizeImages(files: File[], width: number, height: number, keepAspectRatio: boolean = false): Observable<File>`
-This method resize an array of images doing it sequentially to optimize CPU and memory use. 
+### `.resizeImages(files: File[], width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File>`
+This method resize an array of images doing it sequentially to optimize CPU and memory use.
+* **files:[]** - Array of images to resize
+* **width** - Width to be resized (px)
+* **height** - Height to be resized (px)
+* **options** - Based on <a href="https://github.com/nodeca/pica#resizefrom-to-options---promise">pica - resize options</a>, we've also added aspect ratio options: 
+    * **keepAspectRatio** - Set true to ensure the aspect ratio of the image is maintained as it get resized
+    * **forceMinDimensions** - Set true to ensure the dimensions of image resized will be greater than width and height values defined
 
 The Observable receives a next on every file that has been resized.
 If something goes wrong the Observable receive an error.
 
 All errors are wrapped by NgxPicaErrorInterface.
 
-### `.resizeImage(file: File, width: number, height: number, keepAspectRatio: boolean = false): Observable<File>`
+### `.resizeImage(file: File, width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File>`
 Same as above but only takes one file instead of an array of files.
 
 ## Data Structures
+```
+export interface AspectRatioOptions {
+    keepAspectRatio: boolean;
+    forceDimensions?: boolean;
+}
+```
+
+```
+export interface NgxPicaResizeOptionsInterface {
+    aspectRatio?: AspectRatioOptions;
+    quality?: number;
+    alpha?: boolean;
+    unsharpAmount?: number;
+    unsharpRadius?: number;
+    unsharpThreshold?: number;
+}
+```
 ```
 export interface NgxPicaErrorInterface {
     err: any;

@@ -4,6 +4,7 @@ import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
 import pica from 'pica/dist/pica';
 import {NgxPicaErrorInterface} from './ngx-pica-error.interface';
+import {NgxPicaResizeOptionsInterface} from './ngx-pica-resize-options.interface';
 
 declare let window: any;
 
@@ -11,7 +12,7 @@ declare let window: any;
 export class NgxPicaService {
 
 
-    public resizeImages(files: File[], width: number, height: number, keepAspectRatio: boolean = false): Observable<File> {
+    public resizeImages(files: File[], width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File> {
         const resizedImage: Subject<File> = new Subject();
         const totalFiles: number = files.length;
 
@@ -20,7 +21,7 @@ export class NgxPicaService {
             let index: number = 0;
 
             const subscription: Subscription = nextFile.subscribe((file: File) => {
-                this.resizeImage(file, width, height, keepAspectRatio).subscribe(imageResized => {
+                this.resizeImage(file, width, height, options).subscribe(imageResized => {
                     index++;
                     resizedImage.next(imageResized);
 
@@ -54,7 +55,7 @@ export class NgxPicaService {
         return resizedImage.asObservable();
     }
 
-    public resizeImage(file: File, width: number, height: number, keepAspectRatio: boolean = false): Observable<File> {
+    public resizeImage(file: File, width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File> {
         const resizedImage: Subject<File> = new Subject();
         const originCanvas: HTMLCanvasElement = document.createElement('canvas');
         const ctx = originCanvas.getContext('2d');
@@ -74,17 +75,25 @@ export class NgxPicaService {
                 ctx.drawImage(img, 0, 0);
 
                 let imageData = ctx.getImageData(0, 0, img.width, img.height);
-                if (keepAspectRatio) {
-                    let ratio = Math.min(width / imageData.width, height / imageData.height);
+                if (options && options.aspectRatio && options.aspectRatio.keepAspectRatio) {
+                    let ratio = 0;
+
+                    if (options.aspectRatio.forceMinDimensions) {
+                        ratio = Math.max(width / imageData.width, height / imageData.height);
+                    } else {
+                        ratio = Math.min(width / imageData.width, height / imageData.height);
+                    }
+
                     width = Math.round(imageData.width * ratio);
                     height = Math.round(imageData.height * ratio);
                 }
+
 
                 const destinationCanvas: HTMLCanvasElement = document.createElement('canvas');
                 destinationCanvas.width = width;
                 destinationCanvas.height = height;
 
-                resizer.resize(originCanvas, destinationCanvas)
+                resizer.resize(originCanvas, destinationCanvas, options)
                     .catch((err) => resizedImage.error(err))
                     .then((resizedCanvas: HTMLCanvasElement) => resizer.toBlob(resizedCanvas, file.type))
                     .then((blob: Blob) => {
