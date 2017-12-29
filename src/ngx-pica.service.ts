@@ -2,15 +2,20 @@ import {Injectable} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
-import pica from 'pica/dist/pica';
 import {NgxPicaErrorInterface} from './ngx-pica-error.interface';
 import {NgxPicaResizeOptionsInterface} from './ngx-pica-resize-options.interface';
+
+import pica from 'pica/dist/pica';
+import {NgxPicaExifService} from './ngx-pica-exif.service';
 
 declare let window: any;
 
 @Injectable()
 export class NgxPicaService {
 
+    constructor(private _ngxPicaExifService: NgxPicaExifService) {
+
+    }
 
     public resizeImages(files: File[], width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File> {
         const resizedImage: Subject<File> = new Subject();
@@ -69,38 +74,40 @@ export class NgxPicaService {
 
         if (ctx) {
             img.onload = () => {
-                originCanvas.width = img.width;
-                originCanvas.height = img.height;
+                this._ngxPicaExifService.getExifOrientedImage(img).then(orientedImage => {
+                    window.URL.revokeObjectURL(img.src);
+                    originCanvas.width = orientedImage.width;
+                    originCanvas.height = orientedImage.height;
 
-                ctx.drawImage(img, 0, 0);
+                    ctx.drawImage(orientedImage, 0, 0);
 
-                let imageData = ctx.getImageData(0, 0, img.width, img.height);
-                if (options && options.aspectRatio && options.aspectRatio.keepAspectRatio) {
-                    let ratio = 0;
+                    let imageData = ctx.getImageData(0, 0, orientedImage.width, orientedImage.height);
+                    if (options && options.aspectRatio && options.aspectRatio.keepAspectRatio) {
+                        let ratio = 0;
 
-                    if (options.aspectRatio.forceMinDimensions) {
-                        ratio = Math.max(width / imageData.width, height / imageData.height);
-                    } else {
-                        ratio = Math.min(width / imageData.width, height / imageData.height);
+                        if (options.aspectRatio.forceMinDimensions) {
+                            ratio = Math.max(width / imageData.width, height / imageData.height);
+                        } else {
+                            ratio = Math.min(width / imageData.width, height / imageData.height);
+                        }
+
+                        width = Math.round(imageData.width * ratio);
+                        height = Math.round(imageData.height * ratio);
                     }
 
-                    width = Math.round(imageData.width * ratio);
-                    height = Math.round(imageData.height * ratio);
-                }
 
+                    const destinationCanvas: HTMLCanvasElement = document.createElement('canvas');
+                    destinationCanvas.width = width;
+                    destinationCanvas.height = height;
 
-                const destinationCanvas: HTMLCanvasElement = document.createElement('canvas');
-                destinationCanvas.width = width;
-                destinationCanvas.height = height;
-
-                resizer.resize(originCanvas, destinationCanvas, options)
-                    .catch((err) => resizedImage.error(err))
-                    .then((resizedCanvas: HTMLCanvasElement) => resizer.toBlob(resizedCanvas, file.type))
-                    .then((blob: Blob) => {
-                        window.URL.revokeObjectURL(img.src);
-                        let fileResized: File = this.generateResultFile(blob, file.name, file.type, new Date().getTime());
-                        resizedImage.next(fileResized);
-                    });
+                    resizer.resize(originCanvas, destinationCanvas, options)
+                        .catch((err) => resizedImage.error(err))
+                        .then((resizedCanvas: HTMLCanvasElement) => resizer.toBlob(resizedCanvas, file.type))
+                        .then((blob: Blob) => {
+                            let fileResized: File = this.generateResultFile(blob, file.name, file.type, new Date().getTime());
+                            resizedImage.next(fileResized);
+                        });
+                });
             };
 
             img.src = window.URL.createObjectURL(file);
