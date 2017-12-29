@@ -17,6 +17,9 @@
       ],
       "pica": [
         "node_modules/pica"
+      ],
+      "exif": [
+        "node_modules/exif-js"
       ]
     },
     "rootDir": ".",
