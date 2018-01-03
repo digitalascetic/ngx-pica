@@ -42,6 +42,19 @@ All errors are wrapped by NgxPicaErrorInterface.
 ### `.resizeImage(file: File, width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File>`
 Same as above but only takes one file instead of an array of files.
 
+### `.compressImages(files: File[], sizeInMB: number): Observable<File>`
+This method compress an array of images doing it sequentially to optimize CPU and memory use.
+* **files:[]** - Array of images to resize
+* **sizeInMB** - File size in MegaBytes
+
+The Observable receives a next on every file that has been resized.
+If something goes wrong the Observable receive an error.
+
+All errors are wrapped by NgxPicaErrorInterface.
+
+### `.compressImage(file: File, sizeInMB: number): Observable<File>`
+Same as above but only takes one file instead of an array of files.
+
 ## Data Structures
 ```
 export interface AspectRatioOptions {
@@ -61,8 +74,14 @@ export interface NgxPicaResizeOptionsInterface {
 }
 ```
 ```
+export enum NgxPicaErrorType {
+    NO_FILES_RECEIVED = 'NO_FILES_RECEIVED',
+    CANVAS_CONTEXT_IDENTIFIER_NOT_SUPPORTED = 'CANVAS_CONTEXT_IDENTIFIER_NOT_SUPPORTED',
+    NOT_BE_ABLE_TO_COMPRESS_ENOUGH = 'NOT_BE_ABLE_TO_COMPRESS_ENOUGH'
+}
+
 export interface NgxPicaErrorInterface {
-    err: any;
+    err: NgxPicaErrorType;
     file?: File;
 }
 ```
