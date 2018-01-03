@@ -24,8 +24,12 @@ import { NgxPicaModule } from 'ngx-pica';
 export class AppModule {}
 ```
 
-## Methods
-### `.resizeImages(files: File[], width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File>`
+## Services
+* **NgxPicaService** - Manipulate images using <a href="https://github.com/nodeca/pica">pica - high quality image resize in browser</a>
+* **NgxPicaImageService** - Supplementary services to help you work with images
+
+## NgxPicaService Methods
+#### `.resizeImages(files: File[], width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File>`
 This method resize an array of images doing it sequentially to optimize CPU and memory use.
 * **files:[]** - Array of images to resize
 * **width** - Width to be resized (px)
@@ -54,6 +58,10 @@ All errors are wrapped by NgxPicaErrorInterface.
 
 ### `.compressImage(file: File, sizeInMB: number): Observable<File>`
 Same as above but only takes one file instead of an array of files.
+
+## NgxPicaImageService Methods
+#### `.isImage(file: File): boolean`
+This method check if a file is an image or not
 
 ## Data Structures
 ```
