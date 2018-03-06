@@ -190,41 +190,40 @@ export class NgxPicaService {
     public compressImage(file: File, sizeInMB: number): Observable<File> {
 
         if (this.bytesToMB(file.size) <= sizeInMB) {
-            setTimeout(() => {
-                return new BehaviorSubject<File>(file).asObservable()
-            }, 0);
-        }
-
-        const compressedImage: Subject<File> = new Subject();
-        const originCanvas: HTMLCanvasElement = document.createElement('canvas');
-        const ctx = originCanvas.getContext('2d');
-        const img = new Image();
-
-        if (ctx) {
-            img.onload = () => {
-                this._ngxPicaExifService.getExifOrientedImage(img).then(orientedImage => {
-                    window.URL.revokeObjectURL(img.src);
-                    originCanvas.width = orientedImage.width;
-                    originCanvas.height = orientedImage.height;
-
-                    ctx.drawImage(orientedImage, 0, 0);
-
-                    this.getCompressedImage(originCanvas, file.type, 1, sizeInMB, 0)
-                        .catch((err) => compressedImage.error(err))
-                        .then((blob: Blob) => {
-                            let imgCompressed: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
-
-                            compressedImage.next(imgCompressed);
-                        });
-                });
-            };
-
-            img.src = window.URL.createObjectURL(file);
+            return new BehaviorSubject<File>(file).asObservable();
         } else {
-            compressedImage.error(NgxPicaErrorType.CANVAS_CONTEXT_IDENTIFIER_NOT_SUPPORTED);
-        }
 
-        return compressedImage.asObservable();
+            const compressedImage: Subject<File> = new Subject();
+            const originCanvas: HTMLCanvasElement = document.createElement('canvas');
+            const ctx = originCanvas.getContext('2d');
+            const img = new Image();
+
+            if (ctx) {
+                img.onload = () => {
+                    this._ngxPicaExifService.getExifOrientedImage(img).then(orientedImage => {
+                        window.URL.revokeObjectURL(img.src);
+                        originCanvas.width = orientedImage.width;
+                        originCanvas.height = orientedImage.height;
+
+                        ctx.drawImage(orientedImage, 0, 0);
+
+                        this.getCompressedImage(originCanvas, file.type, 1, sizeInMB, 0)
+                            .catch((err) => compressedImage.error(err))
+                            .then((blob: Blob) => {
+                                let imgCompressed: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
+
+                                compressedImage.next(imgCompressed);
+                            });
+                    });
+                };
+
+                img.src = window.URL.createObjectURL(file);
+            } else {
+                compressedImage.error(NgxPicaErrorType.CANVAS_CONTEXT_IDENTIFIER_NOT_SUPPORTED);
+            }
+
+            return compressedImage.asObservable();
+        }
     }
 
     /**
