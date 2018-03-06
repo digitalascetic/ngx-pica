@@ -188,12 +188,14 @@ export class NgxPicaService {
      * @returns {Observable<File>}
      */
     public compressImage(file: File, sizeInMB: number): Observable<File> {
+        const compressedImage: Subject<File> = new Subject();
 
         if (this.bytesToMB(file.size) <= sizeInMB) {
-            return new BehaviorSubject<File>(file).asObservable();
+            setTimeout(() => {
+                compressedImage.next(file);
+            });
         } else {
 
-            const compressedImage: Subject<File> = new Subject();
             const originCanvas: HTMLCanvasElement = document.createElement('canvas');
             const ctx = originCanvas.getContext('2d');
             const img = new Image();
@@ -221,9 +223,9 @@ export class NgxPicaService {
             } else {
                 compressedImage.error(NgxPicaErrorType.CANVAS_CONTEXT_IDENTIFIER_NOT_SUPPORTED);
             }
-
-            return compressedImage.asObservable();
         }
+
+        return compressedImage.asObservable();
     }
 
     /**
