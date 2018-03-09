@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./tmp",
+    "declaration": true,
+    "stripInternal": true,
+    "experimentalDecorators": true,
+    "module": "es2015",
+    "target": "es2015",
+    "moduleResolution": "node",
+    "rootDir": "./tmp",
+    "outDir": "./tmp/esm2015",
+    "skipLibCheck": true,
+    "lib": [
+      "es2015",
+      "dom"
+    ]
+  },
+  "files": [
+    "./tmp/public_api.ts"
+  ],
+  "angularCompilerOptions": {
+    "annotateForClosureCompiler": true,
+    "strictMetadataEmit": true,
+    "skipTemplateCodeGen": true,
+    "flatModuleId": "ngx-pica",
+    "flatModuleOutFile": "ngx-pica.js"
+  }
+}

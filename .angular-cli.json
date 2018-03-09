@@ -1,0 +1,33 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "project": {
+    "name": "ngx-pica"
+  },
+  "apps": [
+    {
+      "root": ".",
+      "test": "tests/test.ts",
+      "testTsconfig": "tests/tsconfig.spec.json"
+    }
+  ],
+  "lint": [
+    {
+      "project": "tsconfig-esm5.json",
+      "exclude": "**/node_modules/**"
+    },
+    {
+      "project": "tests/tsconfig.spec.json",
+      "exclude": "**/node_modules/**"
+    }
+  ],
+  "test": {
+    "karma": {
+      "config": "./karma.conf.js"
+    }
+  },
+  "defaults": {
+    "build": {
+      "showCircularDependencies": false
+    }
+  }
+}

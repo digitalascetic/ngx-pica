@@ -1,0 +1,11 @@
+lib
+tests
+karma.conf.js
+.npmignore
+.gitignore
+rollpu.config.js
+tsconfig.json
+tslint.json
+tmp
+.idea
+ngx-pica.iml

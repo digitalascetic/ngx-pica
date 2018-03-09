@@ -1,16 +1,26 @@
 {
-  "name": "ngx-pica",
-  "version": "1.1.4",
+  "name": "@digitalascetic/ngx-pica",
+  "version": "1.1.5",
   "description": "Angular 5 module to resize images files in browser",
-  "main": "index.js",
-  "scripts": {
-    "transpile": "ngc",
-    "package": "rollup -c",
-    "minify": "uglifyjs dist/bundles/ngx-pica.umd.js --screw-ie8 --compress --mangle --comments --output dist/bundles/ngx-pica.umd.min.js",
-    "build": "npm run transpile && npm run package && npm run minify"
-  },
-  "author": "Digital Ascetic",
   "license": "MIT",
+  "main": "./bundles/ngx-pica.umd.js",
+  "module": "./esm5/ngx-pica.js",
+  "es2015": "./esm2015/ngx-pica.js",
+  "typings": "./ngx-pica.d.ts",
+  "scripts": {
+    "build": "npm run clean && npm run build:inline && npm run build:esm2015 && npm run build:fesm2015 && npm run build:esm5 && npm run build:fesm5 && npm run build:umd && npm run build:min && npm run move:assets",
+    "build:inline": "mkdir -p tmp && rsync -a *.ts src ./tmp",
+    "build:esm2015": "ngc -p tsconfig-esm2015.json",
+    "build:esm5": "ngc -p tsconfig-esm5.json",
+    "build:fesm2015": "rollup -c rollup-esm2015.conf.js",
+    "build:fesm5": "rollup -c rollup-esm5.conf.js",
+    "build:umd": "rollup -c rollup-umd.conf.js",
+    "build:min": "uglifyjs dist/bundles/ngx-pica.umd.js --screw-ie8 --compress --mangle --comments --output dist/bundles/ngx-pica.umd.min.js",
+    "move:assets": "cp -r tmp/esm2015/*.d.ts tmp/esm2015/src tmp/esm2015/*.json package.json README.md dist/ && rm dist/src/*.js",
+    "test": "karma start",
+    "clean": "rm -rf dist/ && rm -rf tmp/",
+    "publish:dist": "npm run build && npm publish dist --access public"
+  },
   "keywords": [
     "angular5",
     "pica",
@@ -20,33 +30,36 @@
     "compress"
   ],
   "dependencies": {
+    "@angular/core": "^5.1.2",
     "exif-js": "^2.3.0",
     "pica": "^4.0.1"
   },
-  "peerDependencies": {
-    "@angular/core": "^5.1.2",
-    "@angular/common": "^5.1.2",
-    "@angular/platform-browser": "^5.1.2",
-    "rxjs": "^5.5.2"
-  },
   "devDependencies": {
-    "@angular/common": "^5.1.2",
+    "@angular/cli": "^1.6.5",
+    "ssri": "^5.2.2",
     "@angular/compiler": "^5.1.2",
     "@angular/compiler-cli": "^5.1.2",
-    "@angular/core": "^5.1.2",
-    "@angular/platform-browser": "^5.1.2",
-    "@types/node": "^8.5.2",
-    "core-js": "^2.5.3",
-    "tslint": "~5.7.0",
-    "typescript": "~2.4.2",
+    "@angular-devkit/core": "^0.0.29",
+    "@types/jasmine": "~2.8.3",
+    "@types/jasminewd2": "~2.0.2",
+    "@types/node": "~6.0.60",
+    "codelyzer": "^4.0.1",
+    "@angular/platform-browser": "^5.1.0",
+    "@angular/platform-browser-dynamic": "^5.1.0",
+    "@angular/common": "^5.1.0",
+    "jasmine-core": "~2.8.0",
+    "jasmine-spec-reporter": "~4.2.1",
+    "karma": "~2.0.0",
+    "karma-chrome-launcher": "~2.2.0",
+    "karma-cli": "~1.0.1",
+    "karma-coverage-istanbul-reporter": "^1.2.1",
+    "karma-jasmine": "~1.1.0",
+    "karma-jasmine-html-reporter": "^0.2.2",
+    "ts-node": "~3.2.0",
+    "tslint": "~5.9.1",
+    "typescript": "~2.5.3",
     "rollup": "^0.52.3",
-    "rxjs": "^5.5.2",
-    "uglify-js": "^3.2.2",
-    "zone.js": "^0.8.14"
+    "uglify-js": "^3.2.2"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/digitalascetic/ngx-pica.git"
-  },
-  "homepage": "https://github.com/digitalascetic/ngx-pica#readme"
+  "repository": "https://github.com/digitalascetic/ngx-pica"
 }
