@@ -2,11 +2,10 @@ import {Injectable} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {NgxPicaErrorInterface, NgxPicaErrorType} from './ngx-pica-error.interface';
 import {NgxPicaResizeOptionsInterface} from './ngx-pica-resize-options.interface';
 import {NgxPicaExifService} from './ngx-pica-exif.service';
-import pica from 'pica/dist/pica';
+import * as pica from 'pica';
 
 declare let window: any;
 
@@ -21,14 +20,6 @@ export class NgxPicaService {
         }
     }
 
-    /**
-     * Resize images array
-     * @param {File[]} files
-     * @param {number} width
-     * @param {number} height
-     * @param {NgxPicaResizeOptionsInterface} options
-     * @returns {Observable<File>}
-     */
     public resizeImages(files: File[], width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File> {
         const resizedImage: Subject<File> = new Subject();
         const totalFiles: number = files.length;
@@ -72,15 +63,6 @@ export class NgxPicaService {
         return resizedImage.asObservable();
     }
 
-    /**
-     * Resize image file
-     *
-     * @param {File} file
-     * @param {number} width
-     * @param {number} height
-     * @param {NgxPicaResizeOptionsInterface} options
-     * @returns {Observable<File>}
-     */
     public resizeImage(file: File, width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File> {
         const resizedImage: Subject<File> = new Subject();
         const originCanvas: HTMLCanvasElement = document.createElement('canvas');
@@ -130,13 +112,6 @@ export class NgxPicaService {
         return resizedImage.asObservable();
     }
 
-    /**
-     * Compress images array
-     *
-     * @param {File[]} files
-     * @param {number} sizeInMB
-     * @returns {Observable<File>}
-     */
     public compressImages(files: File[], sizeInMB: number): Observable<File> {
         const compressedImage: Subject<File> = new Subject();
         const totalFiles: number = files.length;
@@ -180,13 +155,6 @@ export class NgxPicaService {
         return compressedImage.asObservable();
     }
 
-    /**
-     * Compress image file
-     *
-     * @param {File} file
-     * @param {number} sizeInMB
-     * @returns {Observable<File>}
-     */
     public compressImage(file: File, sizeInMB: number): Observable<File> {
         const compressedImage: Subject<File> = new Subject();
 
@@ -228,16 +196,6 @@ export class NgxPicaService {
         return compressedImage.asObservable();
     }
 
-    /**
-     * Through Pica toBlob method, compress image file
-     *
-     * @param {HTMLCanvasElement} canvas
-     * @param {string} type
-     * @param {number} quality
-     * @param {number} sizeInMB
-     * @param {number} step
-     * @returns {Promise<Blob>}
-     */
     private getCompressedImage(canvas: HTMLCanvasElement, type: string, quality: number, sizeInMB: number, step: number): Promise<Blob> {
         return new Promise<Blob>((resolve, reject) => {
             this.picaResizer.toBlob(canvas, type, quality)
@@ -253,16 +211,6 @@ export class NgxPicaService {
         });
     }
 
-    /**
-     * Check if image has been compressed enough
-     *
-     * @param {HTMLCanvasElement} canvas
-     * @param {Blob} blob
-     * @param {number} quality
-     * @param {number} sizeInMB
-     * @param {number} step
-     * @returns {Promise<Blob>}
-     */
     private checkCompressedImageSize(canvas: HTMLCanvasElement, blob: Blob, quality: number, sizeInMB: number, step: number): Promise<Blob> {
         return new Promise<Blob>((resolve, reject) => {
 
@@ -282,15 +230,6 @@ export class NgxPicaService {
         });
     }
 
-    /**
-     * Through Pica resize method, resize image file
-     *
-     * @param {File} file
-     * @param {HTMLCanvasElement} from
-     * @param {HTMLCanvasElement} to
-     * @param options
-     * @returns {Promise<File>}
-     */
     private picaResize(file: File, from: HTMLCanvasElement, to: HTMLCanvasElement, options: any): Promise<File> {
         return new Promise<File>((resolve, reject) => {
             this.picaResizer.resize(from, to, options)
@@ -303,25 +242,10 @@ export class NgxPicaService {
         });
     }
 
-    /**
-     * Return new File from Blob
-     *
-     * @param {Blob} blob
-     * @param {string} name
-     * @param {string} type
-     * @param {number} lastModified
-     * @returns {File}
-     */
     private blobToFile(blob: Blob, name: string, type: string, lastModified: number): File {
         return new File([blob], name, {type: type, lastModified: lastModified});
     }
 
-    /**
-     * Convert bytes to MegaBytes
-     *
-     * @param {number} bytes
-     * @returns {number}
-     */
     private bytesToMB(bytes: number) {
         return bytes / 1048576;
     }

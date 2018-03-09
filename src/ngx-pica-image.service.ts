@@ -126,12 +126,6 @@ export class NgxPicaImageService {
         "tga"
     ];
 
-    /**
-     * Check if given file is an image or not
-     *
-     * @param {File} file
-     * @returns {boolean}
-     */
     public isImage(file: File): boolean {
         const fileExtension: string = file.name.toLowerCase().substr(file.name.lastIndexOf('.') + 1);
         return (this.imageExtensions.indexOf(fileExtension) !== -1);

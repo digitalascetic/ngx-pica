@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@angular/cli": "^1.6.5",
+    "zone.js": "^0.8.19",
     "ssri": "^5.2.2",
     "@angular/compiler": "^5.1.2",
     "@angular/compiler-cli": "^5.1.2",
