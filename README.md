@@ -1,10 +1,10 @@
-# ngx-pica
-> ngx-pica is an Angular 5 module to resize images files in browser using <a href="https://github.com/nodeca/pica">pica - high quality image resize in browser</a>. 
+# @digitalascetic/ngx-pica
+> @digitalascetic/ngx-pica is an Angular 5 module to resize images files in browser using <a href="https://github.com/nodeca/pica">pica - high quality image resize in browser</a>. 
 
 ## Install
 1. Add `ngx-pica` module as dependency to your project.
 ```bash
-$ npm install ngx-pica --save
+$ npm install @digitalascetic/ngx-pica --save
 ```
 2. Include `NgxPicaModule` into your main AppModule or in module where you will use it.
 ```
