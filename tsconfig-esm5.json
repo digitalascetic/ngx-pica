@@ -8,7 +8,7 @@
     "annotateForClosureCompiler": true,
     "strictMetadataEmit": true,
     "skipTemplateCodeGen": true,
-    "flatModuleId": "ngx-pica",
+    "flatModuleId": "@digitalascetic/ngx-pica",
     "flatModuleOutFile": "ngx-pica.js"
   }
 }

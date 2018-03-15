@@ -4,7 +4,7 @@ export default {
         file: 'dist/bundles/ngx-pica.umd.js',
         format: 'umd'
     },
-    name: 'ngx-pica',
+    name: 'ng.ngx-pica',
     external: ['@angular/core', 'exif-js', 'pica'],
     globals: {
         '@angular/core': 'ng.core',
