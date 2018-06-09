@@ -10,5 +10,4 @@ import {NgxPicaImageService} from './ngx-pica-image.service';
         {provide: NgxPicaImageService, useClass: NgxPicaImageService},
     ]
 })
-export class NgxPicaModule {
-}
+export class NgxPicaModule {}
