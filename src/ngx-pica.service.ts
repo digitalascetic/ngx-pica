@@ -1,18 +1,16 @@
 import {Injectable} from '@angular/core';
-import {Subject} from 'rxjs/Subject';
-import {Observable} from 'rxjs/Observable';
-import {Subscription} from 'rxjs/Subscription';
+import {Subject, Observable, Subscription} from 'rxjs';
 import {NgxPicaErrorInterface, NgxPicaErrorType} from './ngx-pica-error.interface';
 import {NgxPicaResizeOptionsInterface} from './ngx-pica-resize-options.interface';
 import {NgxPicaExifService} from './ngx-pica-exif.service';
-import * as pica from 'pica';
+import pica from 'pica';
 
 declare let window: any;
 
 @Injectable()
 export class NgxPicaService {
     private picaResizer = new pica();
-    private MAX_STEPS: number = 20;
+    private MAX_STEPS = 20;
 
     constructor(private _ngxPicaExifService: NgxPicaExifService) {
         if (!this.picaResizer || !this.picaResizer.resize) {
@@ -26,7 +24,7 @@ export class NgxPicaService {
 
         if (totalFiles > 0) {
             const nextFile: Subject<File> = new Subject();
-            let index: number = 0;
+            let index = 0;
 
             const subscription: Subscription = nextFile.subscribe((file: File) => {
                 this.resizeImage(file, width, height, options).subscribe(imageResized => {
@@ -78,7 +76,7 @@ export class NgxPicaService {
 
                     ctx.drawImage(orientedImage, 0, 0);
 
-                    let imageData = ctx.getImageData(0, 0, orientedImage.width, orientedImage.height);
+                    const imageData = ctx.getImageData(0, 0, orientedImage.width, orientedImage.height);
                     if (options && options.aspectRatio && options.aspectRatio.keepAspectRatio) {
                         let ratio = 0;
 
@@ -118,7 +116,7 @@ export class NgxPicaService {
 
         if (totalFiles > 0) {
             const nextFile: Subject<File> = new Subject();
-            let index: number = 0;
+            let index = 0;
 
             const subscription: Subscription = nextFile.subscribe((file: File) => {
                 this.compressImage(file, sizeInMB).subscribe(imageCompressed => {
@@ -180,7 +178,7 @@ export class NgxPicaService {
                         this.getCompressedImage(originCanvas, file.type, 1, sizeInMB, 0)
                             .catch((err) => compressedImage.error(err))
                             .then((blob: Blob) => {
-                                let imgCompressed: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
+                                const imgCompressed: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
 
                                 compressedImage.next(imgCompressed);
                             });
@@ -203,16 +201,23 @@ export class NgxPicaService {
                 .then((blob: Blob) => {
                     this.checkCompressedImageSize(canvas, blob, quality, sizeInMB, step)
                         .catch((err) => reject(err))
-                        .then((blob: Blob) => {
-                                resolve(blob);
+                        .then((compressedBlob: Blob) => {
+                                resolve(compressedBlob);
                             }
-                        )
+                        );
                 });
         });
     }
 
-    private checkCompressedImageSize(canvas: HTMLCanvasElement, blob: Blob, quality: number, sizeInMB: number, step: number): Promise<Blob> {
-        return new Promise<Blob>((resolve, reject) => {
+    private checkCompressedImageSize(
+        canvas: HTMLCanvasElement,
+        blob: Blob,
+        quality: number,
+        sizeInMB: number,
+        step: number
+    ): Promise<Blob> {
+        return new Promise<Blob>((resolve,
+            reject) => {
 
             if (step > this.MAX_STEPS) {
                 reject(NgxPicaErrorType.NOT_BE_ABLE_TO_COMPRESS_ENOUGH);
@@ -236,7 +241,7 @@ export class NgxPicaService {
                 .catch((err) => reject(err))
                 .then((resizedCanvas: HTMLCanvasElement) => this.picaResizer.toBlob(resizedCanvas, file.type))
                 .then((blob: Blob) => {
-                    let fileResized: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
+                    const fileResized: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
                     resolve(fileResized);
                 });
         });

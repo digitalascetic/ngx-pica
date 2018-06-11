@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import * as EXIF from 'exif-js';
+import EXIF from 'exif-js';
 
 
 @Injectable()
@@ -7,7 +7,7 @@ export class NgxPicaExifService {
 
     public getExifOrientedImage(image: HTMLImageElement): Promise<HTMLImageElement> {
         return new Promise<HTMLImageElement>((resolve, reject) => {
-            EXIF.getData(image, () => {
+            EXIF.getData((image as any), () => {
                 const allExifMetaData = EXIF.getAllTags(image),
                     exifOrientation = allExifMetaData.Orientation;
 
