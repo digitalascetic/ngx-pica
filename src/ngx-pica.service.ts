@@ -3,7 +3,8 @@ import {Subject, Observable, Subscription} from 'rxjs';
 import {NgxPicaErrorInterface, NgxPicaErrorType} from './ngx-pica-error.interface';
 import {NgxPicaResizeOptionsInterface} from './ngx-pica-resize-options.interface';
 import {NgxPicaExifService} from './ngx-pica-exif.service';
-import pica from 'pica';
+import * as pica from 'pica';
+
 
 declare let window: any;
 
