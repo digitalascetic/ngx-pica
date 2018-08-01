@@ -1,6 +1,6 @@
 {
   "name": "@digitalascetic/ngx-pica",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Angular 6 module to resize images files in browser",
   "license": "MIT",
   "main": "./bundles/ngx-pica.umd.js",

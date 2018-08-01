@@ -169,18 +169,21 @@ export class NgxPicaService {
 
             if (ctx) {
                 img.onload = () => {
-                    originCanvas.width = img.width;
-                    originCanvas.height = img.height;
+                    this._ngxPicaExifService.getExifOrientedImage(img).then(orientedImage => {
+                        window.URL.revokeObjectURL(img.src);
+                        originCanvas.width = orientedImage.width;
+                        originCanvas.height = orientedImage.height;
 
-                    ctx.drawImage(img, 0, 0);
+                        ctx.drawImage(orientedImage, 0, 0);
 
-                    this.getCompressedImage(originCanvas, file.type, 1, sizeInMB, 0)
-                        .catch((err) => compressedImage.error(err))
-                        .then((blob: Blob) => {
-                            const imgCompressed: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
+                        this.getCompressedImage(originCanvas, file.type, 1, sizeInMB, 0)
+                            .catch((err) => compressedImage.error(err))
+                            .then((blob: Blob) => {
+                                const imgCompressed: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
 
-                            compressedImage.next(imgCompressed);
-                        });
+                                compressedImage.next(imgCompressed);
+                            });
+                    });
                 };
 
                 img.src = window.URL.createObjectURL(file);
@@ -215,7 +218,7 @@ export class NgxPicaService {
         step: number
     ): Promise<Blob> {
         return new Promise<Blob>((resolve,
-                                  reject) => {
+            reject) => {
 
             if (step > this.MAX_STEPS) {
                 reject(NgxPicaErrorType.NOT_BE_ABLE_TO_COMPRESS_ENOUGH);
