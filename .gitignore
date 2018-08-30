@@ -45,3 +45,5 @@ Thumbs.db
 ngx-pica.iml
 
 release.sh
+
+package-lock.json
