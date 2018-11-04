@@ -222,9 +222,7 @@ export class NgxPicaService {
 
             if (step > this.MAX_STEPS) {
                 reject(NgxPicaErrorType.NOT_BE_ABLE_TO_COMPRESS_ENOUGH);
-            }
-
-            if (this.bytesToMB(blob.size) < sizeInMB) {
+            } else if (this.bytesToMB(blob.size) < sizeInMB) {
                 resolve(blob);
             } else {
                 const newQuality: number = quality - (quality * 0.1);
