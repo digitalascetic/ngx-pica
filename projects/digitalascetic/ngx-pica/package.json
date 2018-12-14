@@ -1,0 +1,10 @@
+{
+  "name": "@digitalascetic/ngx-pica",
+  "version": "7.0.0",
+  "peerDependencies": {
+    "@angular/common": "^7.1.0",
+    "@angular/core": "^7.1.0",
+    "pica": "^5.0.0",
+    "exif-js": "^2.3.0"
+  }
+}
