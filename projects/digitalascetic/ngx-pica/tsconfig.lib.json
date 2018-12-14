@@ -15,7 +15,10 @@
     "lib": [
       "dom",
       "es2018"
-    ]
+    ],
+    "paths": {
+      "pica": ["pica/dist/pica.js"]
+    }
   },
   "angularCompilerOptions": {
     "annotateForClosureCompiler": true,

@@ -3,19 +3,19 @@ import {Subject, Observable, Subscription} from 'rxjs';
 import {NgxPicaErrorInterface, NgxPicaErrorType} from './ngx-pica-error.interface';
 import {NgxPicaResizeOptionsInterface} from './ngx-pica-resize-options.interface';
 import {NgxPicaExifService} from './ngx-pica-exif.service';
-import * as pica from 'pica';
+import Pica from 'pica';
 
 
 declare let window: any;
 
 @Injectable()
 export class NgxPicaService {
-    private picaResizer = new pica();
+    private picaResizer = new Pica();
     private MAX_STEPS = 20;
 
     constructor(private _ngxPicaExifService: NgxPicaExifService) {
         if (!this.picaResizer || !this.picaResizer.resize) {
-            this.picaResizer = new window.pica();
+            this.picaResizer = new window.Pica();
         }
     }
 
