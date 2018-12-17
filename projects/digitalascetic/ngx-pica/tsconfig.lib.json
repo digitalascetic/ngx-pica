@@ -17,7 +17,8 @@
       "es2018"
     ],
     "paths": {
-      "pica": ["pica/dist/pica.js"]
+      "pica": ["node_modules/pica/dist/pica.js"],
+      "exif-js": ["node_modules/exif-js"]
     }
   },
   "angularCompilerOptions": {

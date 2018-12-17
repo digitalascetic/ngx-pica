@@ -21,7 +21,6 @@
     "@angular/router": "~7.1.0",
     "core-js": "^2.5.4",
     "exif-js": "^2.3.0",
-    "exifreader": "^2.5.0",
     "pica": "^5.0.0",
     "rxjs": "~6.3.3",
     "tslib": "^1.9.0",
