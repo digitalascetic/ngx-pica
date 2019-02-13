@@ -3,7 +3,7 @@ export interface AspectRatioOptions {
     forceMinDimensions?: boolean;
 }
 
-export interface NgxPicaResizeOptionsInterface {
+export interface NgxPicaResizeOptions {
     aspectRatio?: AspectRatioOptions;
     quality?: number;
     alpha?: boolean;

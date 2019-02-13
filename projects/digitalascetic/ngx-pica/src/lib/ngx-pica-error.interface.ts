@@ -4,7 +4,7 @@ export enum NgxPicaErrorType {
     NOT_BE_ABLE_TO_COMPRESS_ENOUGH = 'NOT_BE_ABLE_TO_COMPRESS_ENOUGH'
 }
 
-export interface NgxPicaErrorInterface {
+export interface NgxPicaError {
     err: NgxPicaErrorType;
     file?: File;
 }
