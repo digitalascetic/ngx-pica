@@ -1,5 +1,5 @@
-import {NgxPicaService} from './ngx-pica.service';
-import {NgxPicaExifService} from './ngx-pica-exif.service';
+import { NgxPicaService } from './ngx-pica.service';
+import { NgxPicaExifService } from './ngx-pica-exif.service';
 
 declare let window: any;
 

@@ -1,10 +1,9 @@
-import {Injectable} from '@angular/core';
-import {Subject, Observable, Subscription} from 'rxjs';
-import {NgxPicaErrorInterface, NgxPicaErrorType} from './ngx-pica-error.interface';
-import {NgxPicaResizeOptionsInterface} from './ngx-pica-resize-options.interface';
-import {NgxPicaExifService} from './ngx-pica-exif.service';
-import Pica from 'pica';
-
+import { Injectable } from '@angular/core';
+import { Subject, Observable, Subscription } from 'rxjs';
+import { NgxPicaErrorInterface, NgxPicaErrorType } from './ngx-pica-error.interface';
+import { NgxPicaResizeOptionsInterface } from './ngx-pica-resize-options.interface';
+import { NgxPicaExifService } from './ngx-pica-exif.service';
+import Pica from 'pica/dist/pica.js';
 
 declare let window: any;
 
@@ -15,7 +14,7 @@ export class NgxPicaService {
 
     constructor(private _ngxPicaExifService: NgxPicaExifService) {
         if (!this.picaResizer || !this.picaResizer.resize) {
-            this.picaResizer = new window.Pica();
+            this.picaResizer = new Pica();
         }
     }
 
@@ -34,7 +33,6 @@ export class NgxPicaService {
 
                     if (index < totalFiles) {
                         nextFile.next(files[index]);
-
                     } else {
                         resizedImage.complete();
                         subscription.unsubscribe();
@@ -126,7 +124,6 @@ export class NgxPicaService {
 
                     if (index < totalFiles) {
                         nextFile.next(files[index]);
-
                     } else {
                         compressedImage.complete();
                         subscription.unsubscribe();
@@ -158,11 +155,8 @@ export class NgxPicaService {
         const compressedImage: Subject<File> = new Subject();
 
         if (this.bytesToMB(file.size) <= sizeInMB) {
-            setTimeout(() => {
-                compressedImage.next(file);
-            });
+            setTimeout(() => compressedImage.next(file));
         } else {
-
             const originCanvas: HTMLCanvasElement = document.createElement('canvas');
             const ctx = originCanvas.getContext('2d');
             const img = new Image();
@@ -180,7 +174,6 @@ export class NgxPicaService {
                             .catch((err) => compressedImage.error(err))
                             .then((blob: Blob) => {
                                 const imgCompressed: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
-
                                 compressedImage.next(imgCompressed);
                             });
                     });
@@ -203,9 +196,8 @@ export class NgxPicaService {
                     this.checkCompressedImageSize(canvas, blob, quality, sizeInMB, step)
                         .catch((err) => reject(err))
                         .then((compressedBlob: Blob) => {
-                                resolve(compressedBlob);
-                            }
-                        );
+                            resolve(compressedBlob);
+                        });
                 });
         });
     }
@@ -217,9 +209,7 @@ export class NgxPicaService {
         sizeInMB: number,
         step: number
     ): Promise<Blob> {
-        return new Promise<Blob>((resolve,
-            reject) => {
-
+        return new Promise<Blob>((resolve, reject) => {
             if (step > this.MAX_STEPS) {
                 reject(NgxPicaErrorType.NOT_BE_ABLE_TO_COMPRESS_ENOUGH);
             } else if (this.bytesToMB(blob.size) < sizeInMB) {
@@ -227,7 +217,6 @@ export class NgxPicaService {
             } else {
                 const newQuality: number = quality - (quality * 0.1);
                 const newStep: number = step + 1;
-
                 // recursively compression
                 resolve(this.getCompressedImage(canvas, blob.type, newQuality, sizeInMB, newStep));
             }
@@ -247,7 +236,7 @@ export class NgxPicaService {
     }
 
     private blobToFile(blob: Blob, name: string, type: string, lastModified: number): File {
-        return new File([blob], name, {type: type, lastModified: lastModified});
+        return new File([blob], name, { type: type, lastModified: lastModified });
     }
 
     private bytesToMB(bytes: number) {

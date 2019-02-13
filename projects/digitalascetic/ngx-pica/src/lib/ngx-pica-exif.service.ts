@@ -1,6 +1,5 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import * as EXIF from 'exif-js';
-
 
 @Injectable()
 export class NgxPicaExifService {
