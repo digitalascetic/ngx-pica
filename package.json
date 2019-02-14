@@ -1,6 +1,14 @@
 {
   "name": "ngx-pica",
   "version": "0.0.0",
+  "main": "./dist/digitalascetic/ngx-pica/bundles/digitalascetic-ngx-pica.umd.js",
+  "module": "./dist/digitalascetic/ngx-pica/fesm5/digitalascetic-ngx-pica.js",
+  "es2015": "./dist/digitalascetic/ngx-pica/fesm2015/digitalascetic-ngx-pica.js",
+  "esm5": "./dist/digitalascetic/ngx-pica/esm5/digitalascetic-ngx-pica.js",
+  "esm2015": "./dist/digitalascetic/ngx-pica/esm2015/digitalascetic-ngx-pica.js",
+  "fesm5": "./dist/digitalascetic/ngx-pica/fesm5/digitalascetic-ngx-pica.js",
+  "fesm2015": "./dist/digitalascetic/ngx-pica/fesm2015/digitalascetic-ngx-pica.js",
+  "typings": "./dist/digitalascetic/ngx-pica/digitalascetic-ngx-pica.d.ts",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
