@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig-esm5.json",
+  "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "../out-tsc/test",
     "baseUrl": "./",
@@ -10,9 +10,5 @@
       "jasminewd2",
       "node"
     ]
-  },
-  "files": [
-    "test.ts",
-    "ngx-pica.spec.ts"
-  ]
+  }
 }
