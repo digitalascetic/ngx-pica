@@ -3,5 +3,9 @@
   "dest": "../../../dist/digitalascetic/ngx-pica",
   "lib": {
     "entryFile": "src/public_api.ts"
-  }
+  },
+  "whitelistedNonPeerDependencies": [
+    "pica",
+    "exif-js"
+  ]
 }
