@@ -11,7 +11,7 @@ export class NgxPicaExifService {
                 const allExifMetaData = EXIF.getAllTags(image),
                     exifOrientation = allExifMetaData.Orientation;
 
-                if (exifOrientation) {
+                if (exifOrientation && exifOrientation !== 1) {
 
                     if (!/^[1-8]$/.test(exifOrientation)) {
                         throw new Error('orientation should be [1-8]');
