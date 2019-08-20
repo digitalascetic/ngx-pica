@@ -1,5 +1,5 @@
 # @digitalascetic/ngx-pica
-> @digitalascetic/ngx-pica is an Angular 7 (LTS) module to resize images files in browser using <a href="https://github.com/nodeca/pica">pica - high quality image resize in browser</a>.
+> @digitalascetic/ngx-pica is an Angular (LTS) module to resize images files in browser using <a href="https://github.com/nodeca/pica">pica - high quality image resize in browser</a>.
 
 [![latest](https://img.shields.io/npm/v/%40digitalascetic/ngx-pica/latest.svg)](https://www.npmjs.com/package/@digitalascetic/ngx-pica) 
 
