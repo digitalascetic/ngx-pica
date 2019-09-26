@@ -69,6 +69,10 @@ export class NgxPicaService {
         const img = new Image();
 
         if (ctx) {
+            img.onerror = (err) => {
+              resizedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err});
+            };
+
             img.onload = () => {
                 this._ngxPicaExifService.getExifOrientedImage(img).then(orientedImage => {
                     window.URL.revokeObjectURL(img.src);
