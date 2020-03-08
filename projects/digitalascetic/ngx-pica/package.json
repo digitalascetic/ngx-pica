@@ -6,7 +6,7 @@
   "keywords": [
     "angular7",
     "pica",
-    "exif-js",
+    "exifr",
     "image",
     "resize",
     "compress"
@@ -15,7 +15,7 @@
     "@angular/common": "^8.2.2",
     "@angular/core": "^8.2.2",
     "pica": "^5.1.0",
-    "exif-js": "^2.3.0"
+    "exifr": "^4.2.0"
   },
   "repository": "https://github.com/digitalascetic/ngx-pica"
 }
