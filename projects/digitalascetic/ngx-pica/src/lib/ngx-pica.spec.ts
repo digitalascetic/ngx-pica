@@ -1,5 +1,7 @@
 import {NgxPicaService} from './ngx-pica.service';
 import {NgxPicaExifService} from './ngx-pica-exif.service';
+import {catchError} from "rxjs/operators";
+import {EMPTY} from "rxjs";
 
 declare let window: any;
 
@@ -17,18 +19,23 @@ describe('ngx-pica tests', () => {
 
     const file = new File([blob], 'test');
 
-    ngxPica.resizeImage(file, 32, 32).subscribe((imageResized: File) => {
+    ngxPica.resizeImage(file, 32, 32)
+      .pipe(catchError(err => {
+        console.log(err);
+        return EMPTY;
+      }))
+      .subscribe((imageResized: File) => {
 
-      const img = new Image();
+        const img = new Image();
 
-      img.onload = () => {
-        expect(img.width).toBe(32);
-        expect(img.height).toBe(32);
-        done();
-      };
+        img.onload = () => {
+          expect(img.width).toBe(32);
+          expect(img.height).toBe(32);
+          done();
+        };
 
-      img.src = window.URL.createObjectURL(imageResized);
-    });
+        img.src = window.URL.createObjectURL(imageResized);
+      });
   });
 
 });
