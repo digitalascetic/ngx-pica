@@ -1,19 +1,17 @@
 import {Injectable} from '@angular/core';
-import * as EXIF from 'exif-js';
+import * as exifr from 'exifr';
 
 
 @Injectable()
 export class NgxPicaExifService {
 
     public getExifOrientedImage(image: HTMLImageElement): Promise<HTMLImageElement> {
-        return new Promise<HTMLImageElement>((resolve, reject) => {
-            EXIF.getData((image as any), () => {
-                const allExifMetaData = EXIF.getAllTags(image),
-                    exifOrientation = allExifMetaData.Orientation;
+        return new Promise<HTMLImageElement>(resolve => {
+            exifr.orientation(image).then(exifOrientation => {
 
                 if (exifOrientation && exifOrientation !== 1) {
 
-                    if (!/^[1-8]$/.test(exifOrientation)) {
+                    if (exifOrientation < 1 || exifOrientation > 8) {
                         throw new Error('orientation should be [1-8]');
                     }
 

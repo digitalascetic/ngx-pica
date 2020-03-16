@@ -20,7 +20,7 @@
     "@angular/platform-browser-dynamic": "^8.2.2",
     "@angular/router": "^8.2.2",
     "core-js": "^2.6.9",
-    "exif-js": "^2.3.0",
+    "exifr": "^4.2.0",
     "pica": "^5.1.0",
     "rxjs": "~6.5.2",
     "zone.js": "~0.9.1"

@@ -18,7 +18,7 @@
     ],
     "paths": {
       "pica": ["node_modules/pica/dist/pica.js"],
-      "exif-js": ["node_modules/exif-js"]
+      "exifr": ["node_modules/exifr"]
     }
   },
   "angularCompilerOptions": {
