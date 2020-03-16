@@ -1,10 +1,10 @@
 {
   "name": "@digitalascetic/ngx-pica",
-  "version": "8.0.3",
+  "version": "9.0.0",
   "description": "Angular (LTS) module to resize images files in browser",
   "license": "MIT",
   "keywords": [
-    "angular7",
+    "angular",
     "pica",
     "exifr",
     "image",
@@ -12,8 +12,8 @@
     "compress"
   ],
   "peerDependencies": {
-    "@angular/common": "^8.2.2",
-    "@angular/core": "^8.2.2",
+    "@angular/common": "^9.0.6",
+    "@angular/core": "^9.0.6",
     "pica": "^5.1.0",
     "exifr": "^4.2.0"
   },
