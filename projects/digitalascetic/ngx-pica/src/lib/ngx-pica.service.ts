@@ -62,61 +62,80 @@ export class NgxPicaService {
     return resizedImage.asObservable();
   }
 
-  public resizeImage(file: File, width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File> {
+  public resizeImage(file: File | HTMLImageElement, width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File> {
     const resizedImage: Subject<File> = new Subject();
     const originCanvas: HTMLCanvasElement = document.createElement('canvas');
     const ctx = originCanvas.getContext('2d');
     const img = new Image();
 
     if (ctx) {
-      img.onerror = (err) => {
-        resizedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err});
-      };
-
-      img.onload = () => {
-        this._ngxPicaExifService.getExifOrientedImage(img)
-          .then(orientedImage => {
-            window.URL.revokeObjectURL(img.src);
-            originCanvas.width = orientedImage.width;
-            originCanvas.height = orientedImage.height;
-
-            ctx.drawImage(orientedImage, 0, 0);
-
-            const imageData = ctx.getImageData(0, 0, orientedImage.width, orientedImage.height);
-            if (options && options.aspectRatio && options.aspectRatio.keepAspectRatio) {
-              let ratio = 0;
-
-              if (options.aspectRatio.forceMinDimensions) {
-                ratio = Math.max(width / imageData.width, height / imageData.height);
-              } else {
-                ratio = Math.min(width / imageData.width, height / imageData.height);
-              }
-
-              width = Math.round(imageData.width * ratio);
-              height = Math.round(imageData.height * ratio);
-            }
-
-            const destinationCanvas: HTMLCanvasElement = document.createElement('canvas');
-            destinationCanvas.width = width;
-            destinationCanvas.height = height;
-
-            this.picaResize(file, originCanvas, destinationCanvas, options)
-              .catch((err) => resizedImage.error(err))
-              .then((imgResized: File) => {
-                resizedImage.next(imgResized);
-              });
-          })
-          .catch((err) => {
+      this.loadFile(file)
+        .then(url => {
+          img.onerror = (err) => {
             resizedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err});
-          });
-      };
+          };
 
-      img.src = window.URL.createObjectURL(file);
+          img.onload = () => {
+            this._ngxPicaExifService.getExifOrientedImage(img)
+              .then(orientedImage => {
+
+                originCanvas.width = orientedImage.width;
+                originCanvas.height = orientedImage.height;
+
+                ctx.drawImage(orientedImage, 0, 0);
+
+                const imageData = ctx.getImageData(0, 0, orientedImage.width, orientedImage.height);
+                if (options && options.aspectRatio && options.aspectRatio.keepAspectRatio) {
+                  let ratio = 0;
+
+                  if (options.aspectRatio.forceMinDimensions) {
+                    ratio = Math.max(width / imageData.width, height / imageData.height);
+                  } else {
+                    ratio = Math.min(width / imageData.width, height / imageData.height);
+                  }
+
+                  width = Math.round(imageData.width * ratio);
+                  height = Math.round(imageData.height * ratio);
+                }
+
+                const destinationCanvas: HTMLCanvasElement = document.createElement('canvas');
+                destinationCanvas.width = width;
+                destinationCanvas.height = height;
+                const fileName = this.getImageName(file);
+                const fileType = this.getImageType(file);
+                this.picaResize(fileName, fileType, originCanvas, destinationCanvas, options)
+                  .catch((err) => resizedImage.error(err))
+                  .then((imgResized: File) => {
+                    resizedImage.next(imgResized);
+                  });
+              })
+              .catch((err) => {
+                resizedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err});
+              });
+          };
+          img.crossOrigin = "anonymous";
+          img.src = url;
+        });
     } else {
       resizedImage.error(NgxPicaErrorType.CANVAS_CONTEXT_IDENTIFIER_NOT_SUPPORTED);
     }
 
     return resizedImage.asObservable();
+  }
+
+  private loadFile(file: File | HTMLImageElement): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      if (file['src']) {
+        resolve(file['src']);
+      } else {
+        const reader = new FileReader();
+        reader.addEventListener('load', (event: any) => {
+          resolve(<string>reader.result);
+        });
+
+        reader.readAsDataURL(<File>file);
+      }
+    });
   }
 
   public compressImages(files: File[], sizeInMB: number): Observable<File> {
@@ -176,25 +195,31 @@ export class NgxPicaService {
       const img = new Image();
 
       if (ctx) {
-        img.onload = () => {
-          this._ngxPicaExifService.getExifOrientedImage(img).then(orientedImage => {
-            window.URL.revokeObjectURL(img.src);
-            originCanvas.width = orientedImage.width;
-            originCanvas.height = orientedImage.height;
+        this.loadFile(file)
+          .then(url => {
+            img.onload = () => {
+              this._ngxPicaExifService.getExifOrientedImage(img).then(orientedImage => {
+                originCanvas.width = orientedImage.width;
+                originCanvas.height = orientedImage.height;
 
-            ctx.drawImage(orientedImage, 0, 0);
+                ctx.drawImage(orientedImage, 0, 0);
 
-            this.getCompressedImage(originCanvas, file.type, 1, sizeInMB, 0)
-              .catch((err) => compressedImage.error(err))
-              .then((blob: Blob) => {
-                const imgCompressed: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
+                const fileName = this.getImageName(file);
+                const fileType = this.getImageType(file);
 
-                compressedImage.next(imgCompressed);
+                this.getCompressedImage(originCanvas, fileType, 1, sizeInMB, 0)
+                  .catch((err) => compressedImage.error(err))
+                  .then((blob: Blob) => {
+                    const imgCompressed: File = this.blobToFile(blob, fileName, fileType, new Date().getTime());
+
+                    compressedImage.next(imgCompressed);
+                  });
               });
-          });
-        };
+            };
 
-        img.src = window.URL.createObjectURL(file);
+            img.crossOrigin = "anonymous";
+            img.src = url;
+          });
       } else {
         compressedImage.error(NgxPicaErrorType.CANVAS_CONTEXT_IDENTIFIER_NOT_SUPPORTED);
       }
@@ -242,13 +267,13 @@ export class NgxPicaService {
     });
   }
 
-  private picaResize(file: File, from: HTMLCanvasElement, to: HTMLCanvasElement, options: any): Promise<File> {
+  private picaResize(name: string, type: string, from: HTMLCanvasElement, to: HTMLCanvasElement, options: any): Promise<File> {
     return new Promise<File>((resolve, reject) => {
       this.picaResizer.resize(from, to, options)
         .catch((err) => reject(err))
-        .then((resizedCanvas: HTMLCanvasElement) => this.picaResizer.toBlob(resizedCanvas, file.type))
+        .then((resizedCanvas: HTMLCanvasElement) => this.picaResizer.toBlob(resizedCanvas, type))
         .then((blob: Blob) => {
-          const fileResized: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
+          const fileResized: File = this.blobToFile(blob, name, type, new Date().getTime());
           resolve(fileResized);
         });
     });
@@ -260,5 +285,49 @@ export class NgxPicaService {
 
   private bytesToMB(bytes: number) {
     return bytes / 1048576;
+  }
+
+  private getImageName(el: File | HTMLImageElement): string {
+    if (el['src']) {
+      const fileExtension: string = el['src'].toLowerCase().substr(el['src'].lastIndexOf('.'));
+      const fileName: string = el['src'].toLowerCase().substr(el['src'].lastIndexOf('/') + 1);
+      return fileName.replace(fileExtension, '');
+    } else {
+      return el['name'];
+    }
+  }
+
+  private getImageType(el: File | HTMLImageElement): string {
+    if (el['type'] != null && el['type'] != 'undefined') {
+      return el['type'];
+    } else {
+      if (el['src'].startsWith('data')) {
+        const blob = this.b64toBlob(el['src']);
+        return blob.type;
+      } else {
+        const fileExtension: string = el['src'].toLowerCase().substr(el['src'].lastIndexOf('.') + 1);
+        return 'image/' + fileExtension;
+      }
+    }
+  }
+
+  private b64toBlob(dataURI) {
+    const arr = dataURI.split(',');
+
+    // separate out the mime component
+    const mime = arr[0].match(/:(.*?);/)[1];
+
+    // convert base64 to raw binary data held in a string
+    // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+    const byteString = atob(arr[1]);
+    // write the bytes of the string to an ArrayBuffer
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    // write the ArrayBuffer to a blob, and you're done
+    return new Blob([ab], {type: mime});
   }
 }
