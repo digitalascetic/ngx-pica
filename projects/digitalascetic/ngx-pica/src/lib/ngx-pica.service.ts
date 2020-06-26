@@ -67,51 +67,55 @@ export class NgxPicaService {
     const originCanvas: HTMLCanvasElement = document.createElement('canvas');
     const ctx = originCanvas.getContext('2d');
     const img = new Image();
+    const reader: FileReader = new FileReader();
 
     if (ctx) {
-      img.onerror = (err) => {
-        resizedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err});
-      };
+      reader.addEventListener('load', (event: any) => {
+        img.onerror = (err) => {
+          resizedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err});
+        };
 
-      img.onload = () => {
-        this._ngxPicaExifService.getExifOrientedImage(img)
-          .then(orientedImage => {
-            window.URL.revokeObjectURL(img.src);
-            originCanvas.width = orientedImage.width;
-            originCanvas.height = orientedImage.height;
+        img.onload = () => {
+          this._ngxPicaExifService.getExifOrientedImage(img)
+            .then(orientedImage => {
+              originCanvas.width = orientedImage.width;
+              originCanvas.height = orientedImage.height;
 
-            ctx.drawImage(orientedImage, 0, 0);
+              ctx.drawImage(orientedImage, 0, 0);
 
-            const imageData = ctx.getImageData(0, 0, orientedImage.width, orientedImage.height);
-            if (options && options.aspectRatio && options.aspectRatio.keepAspectRatio) {
-              let ratio = 0;
+              const imageData = ctx.getImageData(0, 0, orientedImage.width, orientedImage.height);
+              if (options && options.aspectRatio && options.aspectRatio.keepAspectRatio) {
+                let ratio = 0;
 
-              if (options.aspectRatio.forceMinDimensions) {
-                ratio = Math.max(width / imageData.width, height / imageData.height);
-              } else {
-                ratio = Math.min(width / imageData.width, height / imageData.height);
+                if (options.aspectRatio.forceMinDimensions) {
+                  ratio = Math.max(width / imageData.width, height / imageData.height);
+                } else {
+                  ratio = Math.min(width / imageData.width, height / imageData.height);
+                }
+
+                width = Math.round(imageData.width * ratio);
+                height = Math.round(imageData.height * ratio);
               }
 
-              width = Math.round(imageData.width * ratio);
-              height = Math.round(imageData.height * ratio);
-            }
+              const destinationCanvas: HTMLCanvasElement = document.createElement('canvas');
+              destinationCanvas.width = width;
+              destinationCanvas.height = height;
 
-            const destinationCanvas: HTMLCanvasElement = document.createElement('canvas');
-            destinationCanvas.width = width;
-            destinationCanvas.height = height;
+              this.picaResize(file, originCanvas, destinationCanvas, options)
+                .catch((err) => resizedImage.error(err))
+                .then((imgResized: File) => {
+                  resizedImage.next(imgResized);
+                });
+            })
+            .catch((err) => {
+              resizedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err});
+            });
+        };
 
-            this.picaResize(file, originCanvas, destinationCanvas, options)
-              .catch((err) => resizedImage.error(err))
-              .then((imgResized: File) => {
-                resizedImage.next(imgResized);
-              });
-          })
-          .catch((err) => {
-            resizedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err});
-          });
-      };
+        img.src = <string>reader.result;
+      });
 
-      img.src = window.URL.createObjectURL(file);
+      reader.readAsDataURL(file);
     } else {
       resizedImage.error(NgxPicaErrorType.CANVAS_CONTEXT_IDENTIFIER_NOT_SUPPORTED);
     }
@@ -174,27 +178,31 @@ export class NgxPicaService {
       const originCanvas: HTMLCanvasElement = document.createElement('canvas');
       const ctx = originCanvas.getContext('2d');
       const img = new Image();
+      const reader: FileReader = new FileReader();
 
       if (ctx) {
-        img.onload = () => {
-          this._ngxPicaExifService.getExifOrientedImage(img).then(orientedImage => {
-            window.URL.revokeObjectURL(img.src);
-            originCanvas.width = orientedImage.width;
-            originCanvas.height = orientedImage.height;
+        reader.addEventListener('load', (event: any) => {
+          img.onload = () => {
+            this._ngxPicaExifService.getExifOrientedImage(img).then(orientedImage => {
+              originCanvas.width = orientedImage.width;
+              originCanvas.height = orientedImage.height;
 
-            ctx.drawImage(orientedImage, 0, 0);
+              ctx.drawImage(orientedImage, 0, 0);
 
-            this.getCompressedImage(originCanvas, file.type, 1, sizeInMB, 0)
-              .catch((err) => compressedImage.error(err))
-              .then((blob: Blob) => {
-                const imgCompressed: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
+              this.getCompressedImage(originCanvas, file.type, 1, sizeInMB, 0)
+                .catch((err) => compressedImage.error(err))
+                .then((blob: Blob) => {
+                  const imgCompressed: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
 
-                compressedImage.next(imgCompressed);
-              });
-          });
-        };
+                  compressedImage.next(imgCompressed);
+                });
+            });
+          };
 
-        img.src = window.URL.createObjectURL(file);
+          img.src = <string>reader.result;
+        });
+
+        reader.readAsDataURL(file);
       } else {
         compressedImage.error(NgxPicaErrorType.CANVAS_CONTEXT_IDENTIFIER_NOT_SUPPORTED);
       }
