@@ -14,11 +14,6 @@
           "options": {
             "tsConfig": "projects/digitalascetic/ngx-pica/tsconfig.lib.json",
             "project": "projects/digitalascetic/ngx-pica/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "projects/digitalascetic/ngx-pica/tsconfig.lib.prod.json"
-            }
           }
         },
         "test": {

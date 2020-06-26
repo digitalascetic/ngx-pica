@@ -53,7 +53,7 @@ If something goes wrong the Observable receive an error.
 
 All errors are wrapped by NgxPicaErrorInterface.
 
-### `.resizeImage(file: File | HtmlImageElement, width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File>`
+### `.resizeImage(file: File, width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File>`
 Same as above but only takes one file instead of an array of files.
 
 ### `.compressImages(files: File[], sizeInMB: number): Observable<File>`
@@ -66,7 +66,7 @@ If something goes wrong the Observable receive an error.
 
 All errors are wrapped by NgxPicaErrorInterface.
 
-### `.compressImage(file: File | HtmlImageElement, sizeInMB: number): Observable<File>`
+### `.compressImage(file: File, sizeInMB: number): Observable<File>`
 Same as above but only takes one file instead of an array of files.
 
 ## NgxPicaImageService Methods

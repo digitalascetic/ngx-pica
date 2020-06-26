@@ -15,36 +15,13 @@ describe('ngx-pica tests', () => {
 
   const ngxPica: NgxPicaService = new NgxPicaService(new NgxPicaExifService());
 
-  it('File should be resized to 32x32', (done) => {
+  it('should be resized to 32x32', (done) => {
 
-    const file = new File([blob], 'test', {type: blob.type});
+    const file = new File([blob], 'test');
 
     ngxPica.resizeImage(file, 32, 32)
       .pipe(catchError(err => {
-        return EMPTY;
-      }))
-      .subscribe((imageResized: File) => {
-
-        const img = new Image();
-
-        img.onload = () => {
-          expect(img.width).toBe(32);
-          expect(img.height).toBe(32);
-          done();
-        };
-
-        img.src = window.URL.createObjectURL(imageResized);
-      });
-  });
-
-  it('HtmlImageElement should be resized to 32x32', (done) => {
-
-    const imgEl = new Image();
-    imgEl.crossOrigin = "anonymous";
-    imgEl.src = 'https://i.imgur.com/fHyEMsl.jpg';
-
-    ngxPica.resizeImage(imgEl, 32, 32)
-      .pipe(catchError(err => {
+        console.log(err);
         return EMPTY;
       }))
       .subscribe((imageResized: File) => {
@@ -64,14 +41,13 @@ describe('ngx-pica tests', () => {
 });
 
 export function b64toBlob(dataURI) {
-  const arr = dataURI.split(',');
-
-  // separate out the mime component
-  const mime = arr[0].match(/:(.*?);/)[1];
-
   // convert base64 to raw binary data held in a string
   // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
-  const byteString = atob(arr[1]);
+  const byteString = atob(dataURI.split(',')[1]);
+
+  // separate out the mime component
+  const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
   // write the bytes of the string to an ArrayBuffer
   const ab = new ArrayBuffer(byteString.length);
   const ia = new Uint8Array(ab);
@@ -80,5 +56,5 @@ export function b64toBlob(dataURI) {
   }
 
   // write the ArrayBuffer to a blob, and you're done
-  return new Blob([ab], {type: mime});
+  return new Blob([ab]);
 }
