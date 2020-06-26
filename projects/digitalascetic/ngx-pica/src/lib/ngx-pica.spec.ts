@@ -3,8 +3,6 @@ import {NgxPicaExifService} from './ngx-pica-exif.service';
 import {catchError} from "rxjs/operators";
 import {EMPTY} from "rxjs";
 
-declare let window: any;
-
 /* tslint:disable:max-line-length */
 
 describe('ngx-pica tests', () => {
@@ -25,16 +23,21 @@ describe('ngx-pica tests', () => {
         return EMPTY;
       }))
       .subscribe((imageResized: File) => {
+        const reader: FileReader = new FileReader();
 
-        const img = new Image();
+        reader.addEventListener('load', (event: any) => {
+          const img = new Image();
 
-        img.onload = () => {
-          expect(img.width).toBe(32);
-          expect(img.height).toBe(32);
-          done();
-        };
+          img.onload = () => {
+            expect(img.width).toBe(32);
+            expect(img.height).toBe(32);
+            done();
+          };
 
-        img.src = window.URL.createObjectURL(imageResized);
+          img.src = <string>reader.result;
+        });
+
+        reader.readAsDataURL(imageResized);
       });
   });
 
