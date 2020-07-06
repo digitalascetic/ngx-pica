@@ -12,8 +12,8 @@
     "compress"
   ],
   "peerDependencies": {
-    "@angular/common": "^8.2.2",
-    "@angular/core": "^8.2.2",
+    "@angular/common": "^10.0.2",
+    "@angular/core": "^10.0.2",
     "pica": "^6.0.0",
     "exifr": "^5.0.2"
   },
