@@ -13,6 +13,7 @@ export class NgxPicaExifService {
           resolve(image);
         })
         .then(exifOrientation => {
+
           if (exifOrientation && exifOrientation !== 1) {
 
             if (exifOrientation < 1 || exifOrientation > 8) {
