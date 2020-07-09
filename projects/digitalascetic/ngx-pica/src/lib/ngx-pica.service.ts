@@ -1,7 +1,11 @@
 import {Injectable} from '@angular/core';
 import {Subject, Observable, Subscription} from 'rxjs';
 import {NgxPicaErrorInterface, NgxPicaErrorType} from './ngx-pica-error.interface';
-import {NgxPicaResizeOptionsInterface} from './ngx-pica-resize-options.interface';
+import {
+  ExifOptions,
+  NgxPicaCompressOptionsInterface,
+  NgxPicaResizeOptionsInterface
+} from './ngx-pica-resize-options.interface';
 import {NgxPicaExifService} from './ngx-pica-exif.service';
 import Pica from 'pica';
 
@@ -69,6 +73,14 @@ export class NgxPicaService {
     const img = new Image();
     const reader: FileReader = new FileReader();
 
+    if (!options) {
+      options = {
+        exifOptions: {
+          forceExifOrientation: true
+        }
+      };
+    }
+
     if (ctx) {
       reader.addEventListener('load', (event: any) => {
         img.onerror = (err) => {
@@ -76,7 +88,7 @@ export class NgxPicaService {
         };
 
         img.onload = () => {
-          this._ngxPicaExifService.getExifOrientedImage(img)
+          this.processImageExifOptions(img, options.exifOptions)
             .then(orientedImage => {
               originCanvas.width = orientedImage.width;
               originCanvas.height = orientedImage.height;
@@ -123,7 +135,7 @@ export class NgxPicaService {
     return resizedImage.asObservable();
   }
 
-  public compressImages(files: File[], sizeInMB: number): Observable<File> {
+  public compressImages(files: File[], sizeInMB: number, options?: NgxPicaCompressOptionsInterface): Observable<File> {
     const compressedImage: Subject<File> = new Subject();
     const totalFiles: number = files.length;
 
@@ -132,7 +144,7 @@ export class NgxPicaService {
       let index = 0;
 
       const subscription: Subscription = nextFile.subscribe((file: File) => {
-        this.compressImage(file, sizeInMB).subscribe(imageCompressed => {
+        this.compressImage(file, sizeInMB, options).subscribe(imageCompressed => {
           index++;
           compressedImage.next(imageCompressed);
 
@@ -166,7 +178,7 @@ export class NgxPicaService {
     return compressedImage.asObservable();
   }
 
-  public compressImage(file: File, sizeInMB: number): Observable<File> {
+  public compressImage(file: File, sizeInMB: number, options?: NgxPicaCompressOptionsInterface): Observable<File> {
     const compressedImage: Subject<File> = new Subject();
 
     if (this.bytesToMB(file.size) <= sizeInMB) {
@@ -180,23 +192,32 @@ export class NgxPicaService {
       const img = new Image();
       const reader: FileReader = new FileReader();
 
+      if (!options) {
+        options = {
+          exifOptions: {
+            forceExifOrientation: true
+          }
+        };
+      }
+
       if (ctx) {
         reader.addEventListener('load', (event: any) => {
           img.onload = () => {
-            this._ngxPicaExifService.getExifOrientedImage(img).then(orientedImage => {
-              originCanvas.width = orientedImage.width;
-              originCanvas.height = orientedImage.height;
+            this.processImageExifOptions(img, options.exifOptions)
+              .then(orientedImage => {
+                originCanvas.width = orientedImage.width;
+                originCanvas.height = orientedImage.height;
 
-              ctx.drawImage(orientedImage, 0, 0);
+                ctx.drawImage(orientedImage, 0, 0);
 
-              this.getCompressedImage(originCanvas, file.type, 1, sizeInMB, 0)
-                .catch((err) => compressedImage.error(err))
-                .then((blob: Blob) => {
-                  const imgCompressed: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
+                this.getCompressedImage(originCanvas, file.type, 1, sizeInMB, 0)
+                  .catch((err) => compressedImage.error(err))
+                  .then((blob: Blob) => {
+                    const imgCompressed: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
 
-                  compressedImage.next(imgCompressed);
-                });
-            });
+                    compressedImage.next(imgCompressed);
+                  });
+              });
           };
 
           img.src = <string>reader.result;
@@ -209,6 +230,18 @@ export class NgxPicaService {
     }
 
     return compressedImage.asObservable();
+  }
+
+  private processImageExifOptions(img: HTMLImageElement, exifOptions: ExifOptions): Promise<HTMLImageElement> {
+    return new Promise<HTMLImageElement>((resolve, reject) => {
+      if (exifOptions.forceExifOrientation) {
+        this._ngxPicaExifService.getExifOrientedImage(img)
+          .then(orientedImage => resolve(orientedImage))
+          .catch(err => reject(err));
+      } else {
+        resolve(img);
+      }
+    });
   }
 
   private getCompressedImage(canvas: HTMLCanvasElement, type: string, quality: number, sizeInMB: number, step: number): Promise<Blob> {
