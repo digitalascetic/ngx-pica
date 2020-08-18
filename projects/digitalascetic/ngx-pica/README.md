@@ -12,7 +12,7 @@ $ npm install @digitalascetic/ngx-pica@1.1.8 --save
 ## Install
 1. Add `ngx-pica` module as dependency to your project.
 ```bash
-$ npm install @digitalascetic/ngx-pica --save
+$ npm install pica exifr @digitalascetic/ngx-pica --save
 ```
 2. Include `NgxPicaModule` into your main AppModule or in module where you will use it.
 ```

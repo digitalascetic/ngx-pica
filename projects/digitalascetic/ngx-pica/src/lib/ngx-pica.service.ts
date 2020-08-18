@@ -8,6 +8,7 @@ import {
 } from './ngx-pica-resize-options.interface';
 import {NgxPicaExifService} from './ngx-pica-exif.service';
 import Pica from 'pica';
+import {switchMap} from "rxjs/operators";
 
 
 declare let window: any;
@@ -31,8 +32,11 @@ export class NgxPicaService {
       const nextFile: Subject<File> = new Subject();
       let index = 0;
 
-      const subscription: Subscription = nextFile.subscribe((file: File) => {
-        this.resizeImage(file, width, height, options).subscribe(imageResized => {
+      const subscription: Subscription = nextFile
+        .pipe(
+          switchMap((file: File) => this.resizeImage(file, width, height, options))
+        )
+        .subscribe(imageResized => {
           index++;
           resizedImage.next(imageResized);
 
@@ -45,13 +49,12 @@ export class NgxPicaService {
           }
         }, (err) => {
           const ngxPicaError: NgxPicaErrorInterface = {
-            file: file,
+            file: files[index],
             err: err
           };
 
           resizedImage.error(ngxPicaError);
         });
-      });
 
       nextFile.next(files[index]);
     } else {
@@ -117,6 +120,7 @@ export class NgxPicaService {
                 .catch((err) => resizedImage.error(err))
                 .then((imgResized: File) => {
                   resizedImage.next(imgResized);
+                  resizedImage.complete();
                 });
             })
             .catch((err) => {
@@ -143,8 +147,11 @@ export class NgxPicaService {
       const nextFile: Subject<File> = new Subject();
       let index = 0;
 
-      const subscription: Subscription = nextFile.subscribe((file: File) => {
-        this.compressImage(file, sizeInMB, options).subscribe(imageCompressed => {
+      const subscription: Subscription = nextFile
+        .pipe(
+          switchMap((file: File) => this.compressImage(file, sizeInMB, options))
+        )
+        .subscribe(imageCompressed => {
           index++;
           compressedImage.next(imageCompressed);
 
@@ -157,13 +164,12 @@ export class NgxPicaService {
           }
         }, (err) => {
           const ngxPicaError: NgxPicaErrorInterface = {
-            file: file,
+            file: files[index],
             err: err
           };
 
           compressedImage.error(ngxPicaError);
         });
-      });
 
       nextFile.next(files[index]);
     } else {
@@ -184,6 +190,7 @@ export class NgxPicaService {
     if (this.bytesToMB(file.size) <= sizeInMB) {
       setTimeout(() => {
         compressedImage.next(file);
+        compressedImage.complete();
       });
     } else {
 
@@ -216,6 +223,7 @@ export class NgxPicaService {
                     const imgCompressed: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
 
                     compressedImage.next(imgCompressed);
+                    compressedImage.complete();
                   });
               });
           };

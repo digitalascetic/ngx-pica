@@ -4,8 +4,8 @@
   "lib": {
     "entryFile": "src/public_api.ts",
     "umdModuleIds": {
-      "pica": "pica",
-      "exifr": "exifr"
+      "exifr": "exifr",
+      "pica": "Pica"
     }
   },
   "whitelistedNonPeerDependencies": [
