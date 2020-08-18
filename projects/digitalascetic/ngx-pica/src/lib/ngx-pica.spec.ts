@@ -1,7 +1,7 @@
 import {NgxPicaService} from './ngx-pica.service';
 import {NgxPicaExifService} from './ngx-pica-exif.service';
 import {catchError} from "rxjs/operators";
-import {EMPTY} from "rxjs";
+import {EMPTY, forkJoin} from "rxjs";
 
 /* tslint:disable:max-line-length */
 
@@ -39,6 +39,43 @@ describe('ngx-pica tests', () => {
 
         reader.readAsDataURL(imageResized);
       });
+  });
+
+  it('should be 5 images resized to 32x32', (done) => {
+    const files = [];
+
+    for (let i = 0; i < 5; i++) {
+      files.push(new File([blob], 'test' + i));
+    }
+
+    forkJoin([
+      ngxPica.resizeImage(files[0], 32, 32),
+      ngxPica.resizeImage(files[1], 32, 32),
+      ngxPica.resizeImage(files[2], 32, 32),
+      ngxPica.resizeImage(files[3], 32, 32),
+      ngxPica.resizeImage(files[4], 32, 32),
+    ]).subscribe((imagesResized: File[]) => {
+      imagesResized.forEach((imageResized, index) => {
+
+        expect(imageResized.name).toBe('test' + index);
+
+        const reader: FileReader = new FileReader();
+
+        reader.addEventListener('load', (event: any) => {
+          const img = new Image();
+
+          img.onload = () => {
+            expect(img.width).toBe(32);
+            expect(img.height).toBe(32);
+            done();
+          };
+
+          img.src = <string>reader.result;
+        });
+
+        reader.readAsDataURL(imageResized);
+      });
+    });
   });
 
 });
