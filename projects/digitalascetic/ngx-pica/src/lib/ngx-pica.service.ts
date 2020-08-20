@@ -74,7 +74,16 @@ export class NgxPicaService {
     const originCanvas: HTMLCanvasElement = document.createElement('canvas');
     const ctx = originCanvas.getContext('2d');
     const img = new Image();
-    const reader: FileReader = new FileReader();
+    let reader: FileReader = new FileReader();
+
+    // Is this a "real" file? In other words, is this an instance of the original `File` class (not the one overridden by cordova-plugin-file).
+    // If so, then we need to use the "real" FileReader (not the one overridden by cordova-plugin-file).
+    if (file instanceof Blob) {
+      const realFileReader = (reader as any)._realReader;
+      if (realFileReader) {
+        reader = realFileReader;
+      }
+    }
 
     if (!options) {
       options = {
