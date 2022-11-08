@@ -2,11 +2,7 @@
   "$schema": "../../../node_modules/ng-packagr/ng-package.schema.json",
   "dest": "../../../dist/digitalascetic/ngx-pica",
   "lib": {
-    "entryFile": "src/public_api.ts",
-    "umdModuleIds": {
-      "exifr": "exifr",
-      "pica": "Pica"
-    }
+    "entryFile": "src/public_api.ts"
   },
   "whitelistedNonPeerDependencies": [
     "pica",

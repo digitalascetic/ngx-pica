@@ -304,7 +304,8 @@ export class NgxPicaService {
   }
 
   private blobToFile(blob: Blob, name: string, type: string, lastModified: number): File {
-    return Object.assign(new Blob([blob], {type: type}), {name: name, lastModified: lastModified});
+    return new File([blob], name, {type: type, lastModified: lastModified});
+    //return Object.assign(new Blob([blob], {type: type}), {name: name, lastModified: lastModified});
   }
 
   private bytesToMB(bytes: number) {
