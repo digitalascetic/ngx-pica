@@ -17,5 +17,8 @@
     "pica": "^6.0.0",
     "exifr": ">=6.0.0"
   },
+  "dependencies": {
+    "tslib": "^2.0.0"
+  },
   "repository": "https://github.com/digitalascetic/ngx-pica"
 }

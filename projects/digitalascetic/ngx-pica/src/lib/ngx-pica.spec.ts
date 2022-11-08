@@ -1,7 +1,7 @@
 import {NgxPicaService} from './ngx-pica.service';
 import {NgxPicaExifService} from './ngx-pica-exif.service';
-import {catchError} from "rxjs/operators";
-import {EMPTY, forkJoin} from "rxjs";
+import {catchError} from 'rxjs/operators';
+import {EMPTY, forkJoin} from 'rxjs';
 
 /* tslint:disable:max-line-length */
 
