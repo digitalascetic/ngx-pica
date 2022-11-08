@@ -35,6 +35,7 @@ describe('ngx-pica tests', () => {
           };
 
           img.src = <string>reader.result;
+          console.log(img.src);
         });
 
         reader.readAsDataURL(imageResized);
