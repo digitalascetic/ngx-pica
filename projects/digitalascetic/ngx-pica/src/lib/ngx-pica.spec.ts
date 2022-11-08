@@ -55,27 +55,28 @@ describe('ngx-pica tests', () => {
       ngxPica.resizeImage(files[3], 32, 32),
       ngxPica.resizeImage(files[4], 32, 32),
     ]).subscribe((imagesResized: File[]) => {
-      imagesResized.forEach((imageResized, index) => {
+        imagesResized.forEach((imageResized, index) => {
 
-        expect(imageResized.name).toBe('test' + index);
+          expect(imageResized.name).toBe('test' + index);
 
-        const reader: FileReader = new FileReader();
+          const reader: FileReader = new FileReader();
 
-        reader.addEventListener('load', (event: any) => {
-          const img = new Image();
+          reader.addEventListener('load', (event: any) => {
+            const img = new Image();
 
-          img.onload = () => {
-            expect(img.width).toBe(32);
-            expect(img.height).toBe(32);
-            done();
-          };
+            img.onload = () => {
+              expect(img.width).toBe(32);
+              expect(img.height).toBe(32);
+            };
 
-          img.src = <string>reader.result;
+            img.src = <string>reader.result;
+          });
+
+          reader.readAsDataURL(imageResized);
         });
-
-        reader.readAsDataURL(imageResized);
-      });
-    });
+      }, () => {
+      },
+      () => done());
   });
 
 });
