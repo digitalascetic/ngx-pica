@@ -12,8 +12,8 @@
     "compress"
   ],
   "peerDependencies": {
-    "@angular/common": ">=14.2.9",
-    "@angular/core": ">=14.2.9",
+    "@angular/common": ">=14.2.0",
+    "@angular/core": ">=14.2.0",
     "pica": "^6.0.0",
     "exifr": ">=6.0.0"
   },
