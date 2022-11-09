@@ -8,7 +8,7 @@ import {
 } from './ngx-pica-resize-options.interface';
 import {NgxPicaExifService} from './ngx-pica-exif.service';
 import Pica from 'pica';
-import {switchMap} from "rxjs/operators";
+import {switchMap} from 'rxjs/operators';
 
 
 declare let window: any;
@@ -254,9 +254,10 @@ export class NgxPicaService {
 
   private getCompressedImage(canvas: HTMLCanvasElement, type: string, quality: number, sizeInMB: number, step: number): Promise<Blob> {
     return new Promise<Blob>((resolve, reject) => {
-      this.picaResizer.toBlob(canvas, type, quality)
+      this.toBlob(canvas, type, quality)
         .catch((err) => reject(err))
         .then((blob: Blob) => {
+          console.log(blob.size);
           this.checkCompressedImageSize(canvas, blob, quality, sizeInMB, step)
             .catch((err) => reject(err))
             .then((compressedBlob: Blob) => {
@@ -276,7 +277,6 @@ export class NgxPicaService {
   ): Promise<Blob> {
     return new Promise<Blob>((resolve,
                               reject) => {
-
       if (step > this.MAX_STEPS) {
         reject(NgxPicaErrorType.NOT_BE_ABLE_TO_COMPRESS_ENOUGH);
       } else if (this.bytesToMB(blob.size) < sizeInMB) {
@@ -310,5 +310,38 @@ export class NgxPicaService {
 
   private bytesToMB(bytes: number) {
     return bytes / 1048576;
+  }
+
+  private toBlob(canvas, mimeType, quality) {
+    return new Promise(function (resolve) {
+      if (canvas.toBlob) {
+        console.log(quality);
+        canvas.toBlob(function (blob) {
+          return resolve(blob);
+        }, mimeType, quality);
+        return;
+      }
+
+      if (canvas.convertToBlob) {
+        resolve(canvas.convertToBlob({
+          type: mimeType,
+          quality: quality
+        }));
+        return;
+      } // Fallback for old browsers
+
+
+      var asString = atob(canvas.toDataURL(mimeType, quality).split(',')[1]);
+      var len = asString.length;
+      var asBuffer = new Uint8Array(len);
+
+      for (var i = 0; i < len; i++) {
+        asBuffer[i] = asString.charCodeAt(i);
+      }
+
+      resolve(new Blob([asBuffer], {
+        type: mimeType
+      }));
+    });
   }
 }
