@@ -14,8 +14,8 @@
   "peerDependencies": {
     "@angular/common": ">=14.2.0",
     "@angular/core": ">=14.2.0",
-    "pica": "^6.0.0",
-    "exifr": ">=6.0.0"
+    "pica": "^9.0.0",
+    "exifr": "^7.1.0"
   },
   "dependencies": {
     "tslib": "^2.0.0"

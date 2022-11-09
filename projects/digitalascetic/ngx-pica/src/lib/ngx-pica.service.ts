@@ -254,10 +254,9 @@ export class NgxPicaService {
 
   private getCompressedImage(canvas: HTMLCanvasElement, type: string, quality: number, sizeInMB: number, step: number): Promise<Blob> {
     return new Promise<Blob>((resolve, reject) => {
-      this.toBlob(canvas, type, quality)
+      this.picaResizer.toBlob(canvas, type, quality)
         .catch((err) => reject(err))
         .then((blob: Blob) => {
-          console.log(blob.size);
           this.checkCompressedImageSize(canvas, blob, quality, sizeInMB, step)
             .catch((err) => reject(err))
             .then((compressedBlob: Blob) => {
@@ -304,44 +303,10 @@ export class NgxPicaService {
   }
 
   private blobToFile(blob: Blob, name: string, type: string, lastModified: number): File {
-    return new File([blob], name, {type: type, lastModified: lastModified});
-    //return Object.assign(new Blob([blob], {type: type}), {name: name, lastModified: lastModified});
+    return Object.assign(new Blob([blob], {type: type}), {name: name, lastModified: lastModified, webkitRelativePath: ''});
   }
 
   private bytesToMB(bytes: number) {
     return bytes / 1048576;
-  }
-
-  private toBlob(canvas, mimeType, quality) {
-    return new Promise(function (resolve) {
-      if (canvas.toBlob) {
-        console.log(quality);
-        canvas.toBlob(function (blob) {
-          return resolve(blob);
-        }, mimeType, quality);
-        return;
-      }
-
-      if (canvas.convertToBlob) {
-        resolve(canvas.convertToBlob({
-          type: mimeType,
-          quality: quality
-        }));
-        return;
-      } // Fallback for old browsers
-
-
-      var asString = atob(canvas.toDataURL(mimeType, quality).split(',')[1]);
-      var len = asString.length;
-      var asBuffer = new Uint8Array(len);
-
-      for (var i = 0; i < len; i++) {
-        asBuffer[i] = asString.charCodeAt(i);
-      }
-
-      resolve(new Blob([asBuffer], {
-        type: mimeType
-      }));
-    });
   }
 }

@@ -92,35 +92,38 @@ describe('ngx-pica tests', () => {
   });
 
   it('should be compress 3MB image to 2MB', (done) => {
-    fetch('https://images.unsplash.com/photo-1579393329936-4bc9bc673651?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb').then(res => res.blob()).then(blobImg => {
-      const file = new File([blobImg], 'test');
-      console.log(file.size);
-      ngxPica.compressImage(file, 2)
-        .pipe(catchError(err => {
-          console.log(err);
-          return EMPTY;
-        }))
-        .subscribe((imageResized: File) => {
-          const reader: FileReader = new FileReader();
+    fetch('https://images.unsplash.com/photo-1579393329936-4bc9bc673651?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb')
+      .then(res => res.blob())
+      .then(blobImg => {
 
-          expect(imageResized.size).toBe(2014);
-          console.log(imageResized.size);
+        const file = new File([blobImg], 'test');
+        console.log(file.size);
+        ngxPica.compressImage(file, 2)
+          .pipe(catchError(err => {
+            console.log(err);
+            return EMPTY;
+          }))
+          .subscribe((imageResized: File) => {
+            const reader: FileReader = new FileReader();
 
-          reader.addEventListener('load', (event: any) => {
-            const img = new Image();
+            expect(imageResized.size).toBe(2014);
+            console.log(imageResized.size);
 
-            img.onload = () => {
-              expect(img.width).toBe(4096);
-              expect(img.height).toBe(2692);
-              done();
-            };
+            reader.addEventListener('load', (event: any) => {
+              const img = new Image();
 
-            img.src = <string>reader.result;
+              img.onload = () => {
+                expect(img.width).toBe(4096);
+                expect(img.height).toBe(2692);
+                done();
+              };
+
+              img.src = <string>reader.result;
+            });
+
+            reader.readAsDataURL(imageResized);
           });
-
-          reader.readAsDataURL(imageResized);
-        });
-    });
+      });
   });
 
 });
