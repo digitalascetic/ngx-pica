@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import * as exifr from 'exifr';
+import exifr from 'exifr';
 
 
 @Injectable()

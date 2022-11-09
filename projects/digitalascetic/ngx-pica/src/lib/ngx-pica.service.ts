@@ -8,7 +8,7 @@ import {
 } from './ngx-pica-resize-options.interface';
 import {NgxPicaExifService} from './ngx-pica-exif.service';
 import Pica from 'pica';
-import {switchMap} from "rxjs/operators";
+import {switchMap} from 'rxjs/operators';
 
 
 declare let window: any;
@@ -276,7 +276,6 @@ export class NgxPicaService {
   ): Promise<Blob> {
     return new Promise<Blob>((resolve,
                               reject) => {
-
       if (step > this.MAX_STEPS) {
         reject(NgxPicaErrorType.NOT_BE_ABLE_TO_COMPRESS_ENOUGH);
       } else if (this.bytesToMB(blob.size) < sizeInMB) {
@@ -304,7 +303,7 @@ export class NgxPicaService {
   }
 
   private blobToFile(blob: Blob, name: string, type: string, lastModified: number): File {
-    return Object.assign(new Blob([blob], {type: type}), {name: name, lastModified: lastModified});
+    return Object.assign(new Blob([blob], {type: type}), {name: name, lastModified: lastModified, webkitRelativePath: ''});
   }
 
   private bytesToMB(bytes: number) {
