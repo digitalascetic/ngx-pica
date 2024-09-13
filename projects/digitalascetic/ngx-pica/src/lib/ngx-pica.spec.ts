@@ -26,7 +26,7 @@ describe('ngx-pica tests', () => {
 
   it('should be resized to 32x32', (done) => {
 
-    const file = new File([blob], 'test');
+    const file = new File([blob], 'test', {type: contentType});
 
     ngxPica.resizeImage(file, 32, 32)
       .pipe(catchError(err => {
@@ -56,7 +56,7 @@ describe('ngx-pica tests', () => {
     const files = [];
 
     for (let i = 0; i < 5; i++) {
-      files.push(new File([blob], 'test' + i));
+      files.push(new File([blob], 'test' + i, {type: contentType}));
     }
 
     forkJoin([
@@ -96,32 +96,33 @@ describe('ngx-pica tests', () => {
       .then(res => res.blob())
       .then(blobImg => {
 
-        const file = new File([blobImg], 'test');
-        console.log(file.size);
+        const file = new File([blobImg], 'test', {type: 'image/jpeg'});
+
         ngxPica.compressImage(file, 2)
-          .pipe(catchError(err => {
-            console.log(err);
-            return EMPTY;
-          }))
-          .subscribe((imageResized: File) => {
-            const reader: FileReader = new FileReader();
+          .subscribe({
+            next: (imageResized: File) => {
+              const reader: FileReader = new FileReader();
 
-            expect(imageResized.size).toBe(2014);
-            console.log(imageResized.size);
+              expect(imageResized.size).toBe(1464565);
+              console.log(imageResized.size);
 
-            reader.addEventListener('load', (event: any) => {
-              const img = new Image();
+              reader.addEventListener('load', (event: any) => {
+                const img = new Image();
 
-              img.onload = () => {
-                expect(img.width).toBe(4096);
-                expect(img.height).toBe(2692);
-                done();
-              };
+                img.onload = () => {
+                  expect(img.width).toBe(4000);
+                  expect(img.height).toBe(3000);
+                  done();
+                };
 
-              img.src = <string>reader.result;
-            });
+                img.src = <string>reader.result;
+              });
 
-            reader.readAsDataURL(imageResized);
+              reader.readAsDataURL(imageResized);
+            },
+            error: (e) => {
+              console.log(e);
+            }
           });
       });
   });

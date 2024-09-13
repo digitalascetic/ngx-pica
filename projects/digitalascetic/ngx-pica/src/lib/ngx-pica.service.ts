@@ -36,24 +36,27 @@ export class NgxPicaService {
         .pipe(
           switchMap((file: File) => this.resizeImage(file, width, height, options))
         )
-        .subscribe(imageResized => {
-          index++;
-          resizedImage.next(imageResized);
+        .subscribe({
+          next: imageResized => {
+            index++;
+            resizedImage.next(imageResized);
 
-          if (index < totalFiles) {
-            nextFile.next(files[index]);
+            if (index < totalFiles) {
+              nextFile.next(files[index]);
 
-          } else {
-            resizedImage.complete();
-            subscription.unsubscribe();
+            } else {
+              resizedImage.complete();
+              subscription.unsubscribe();
+            }
+          },
+          error: (err) => {
+            const ngxPicaError: NgxPicaErrorInterface = {
+              file: files[index],
+              err: err
+            };
+
+            resizedImage.error(ngxPicaError);
           }
-        }, (err) => {
-          const ngxPicaError: NgxPicaErrorInterface = {
-            file: files[index],
-            err: err
-          };
-
-          resizedImage.error(ngxPicaError);
         });
 
       nextFile.next(files[index]);
@@ -117,11 +120,11 @@ export class NgxPicaService {
               destinationCanvas.height = height;
 
               this.picaResize(file, originCanvas, destinationCanvas, options)
-                .catch((err) => resizedImage.error(err))
                 .then((imgResized: File) => {
                   resizedImage.next(imgResized);
                   resizedImage.complete();
-                });
+                })
+                .catch((err) => resizedImage.error(err));
             })
             .catch((err) => {
               resizedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err});
@@ -218,13 +221,13 @@ export class NgxPicaService {
                 ctx.drawImage(orientedImage, 0, 0);
 
                 this.getCompressedImage(originCanvas, file.type, 1, sizeInMB, 0)
-                  .catch((err) => compressedImage.error(err))
                   .then((blob: Blob) => {
                     const imgCompressed: File = this.blobToFile(blob, file.name, file.type, new Date().getTime());
 
                     compressedImage.next(imgCompressed);
                     compressedImage.complete();
-                  });
+                  })
+                  .catch((err) => compressedImage.error(err));
               });
           };
 
@@ -258,11 +261,11 @@ export class NgxPicaService {
         .catch((err) => reject(err))
         .then((blob: Blob) => {
           this.checkCompressedImageSize(canvas, blob, quality, sizeInMB, step)
-            .catch((err) => reject(err))
             .then((compressedBlob: Blob) => {
                 resolve(compressedBlob);
               }
-            );
+            )
+            .catch((err) => reject(err));
         });
     });
   }
