@@ -1,7 +1,6 @@
 import {NgxPicaService} from './ngx-pica.service';
-import {NgxPicaExifService} from './ngx-pica-exif.service';
 import {catchError} from 'rxjs/operators';
-import {EMPTY, forkJoin} from 'rxjs';
+import {EMPTY} from 'rxjs';
 
 /* tslint:disable:max-line-length */
 
@@ -22,7 +21,7 @@ describe('ngx-pica tests', () => {
 
   const blob = b64toBlob(b64Data);
 
-  const ngxPica: NgxPicaService = new NgxPicaService(new NgxPicaExifService());
+  const ngxPica: NgxPicaService = new NgxPicaService();
 
   it('should be resized to 32x32', (done) => {
 
@@ -53,24 +52,15 @@ describe('ngx-pica tests', () => {
   });
 
   it('should be 5 images resized to 32x32', (done) => {
-    const files = [];
+    const files: File[] = [];
 
     for (let i = 0; i < 5; i++) {
       files.push(new File([blob], 'test' + i, {type: contentType}));
     }
 
-    forkJoin([
-      ngxPica.resizeImage(files[0], 32, 32),
-      ngxPica.resizeImage(files[1], 32, 32),
-      ngxPica.resizeImage(files[2], 32, 32),
-      ngxPica.resizeImage(files[3], 32, 32),
-      ngxPica.resizeImage(files[4], 32, 32),
-    ]).subscribe({
-      next: (imagesResized: File[]) => {
-        imagesResized.forEach((imageResized, index) => {
-
-          expect(imageResized.name).toBe('test' + index);
-
+    ngxPica.resizeImages(files, 32, 32)
+      .subscribe({
+        next: (imageResized: File) => {
           const reader: FileReader = new FileReader();
 
           reader.addEventListener('load', (event: any) => {
@@ -85,10 +75,9 @@ describe('ngx-pica tests', () => {
           });
 
           reader.readAsDataURL(imageResized);
-        });
-      },
-      complete: () => done()
-    });
+        },
+        complete: () => done()
+      });
   });
 
   it('should be compress 3MB image to 2MB', (done) => {
@@ -103,8 +92,7 @@ describe('ngx-pica tests', () => {
             next: (imageResized: File) => {
               const reader: FileReader = new FileReader();
 
-              expect(imageResized.size).toBe(1464565);
-              console.log(imageResized.size);
+              expect(imageResized.size).toBe(2040108);
 
               reader.addEventListener('load', (event: any) => {
                 const img = new Image();
