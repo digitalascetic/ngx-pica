@@ -138,8 +138,10 @@ export class NgxPicaService {
     const compressedImage: Subject<File> = new Subject();
 
     if (this.bytesToMB(file.size) <= sizeInMB) {
-      compressedImage.next(file);
-      compressedImage.complete();
+      setTimeout(() => {
+        compressedImage.next(file);
+        compressedImage.complete();
+      });
     } else {
       imageCompression.getExifOrientation(file)
         .then(orientation => {
@@ -166,7 +168,7 @@ export class NgxPicaService {
               compressedImage.next(compressedFile);
               compressedImage.complete();
             })
-            .catch(err => compressedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err}));
+            .catch(err2 => compressedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err2}));
         });
     }
 
