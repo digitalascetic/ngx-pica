@@ -140,35 +140,35 @@ export class NgxPicaService {
     if (this.bytesToMB(file.size) <= sizeInMB) {
       compressedImage.next(file);
       compressedImage.complete();
+    } else {
+      imageCompression.getExifOrientation(file)
+        .then(orientation => {
+          imageCompression(file, {
+            maxSizeMB: sizeInMB,
+            exifOrientation: orientation,
+            alwaysKeepResolution: true,
+            maxIteration: this.MAX_STEPS
+          })
+            .then(compressedFile => {
+              compressedImage.next(compressedFile);
+              compressedImage.complete();
+            })
+            .catch(err => compressedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err}));
+
+        })
+        .catch(err => {
+          imageCompression(file, {
+            maxSizeMB: sizeInMB,
+            alwaysKeepResolution: true,
+            maxIteration: this.MAX_STEPS
+          })
+            .then(compressedFile => {
+              compressedImage.next(compressedFile);
+              compressedImage.complete();
+            })
+            .catch(err => compressedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err}));
+        });
     }
-
-    imageCompression.getExifOrientation(file)
-      .then(orientation => {
-        imageCompression(file, {
-          maxSizeMB: sizeInMB,
-          exifOrientation: orientation,
-          alwaysKeepResolution: true,
-          maxIteration: this.MAX_STEPS
-        })
-          .then(compressedFile => {
-            compressedImage.next(compressedFile);
-            compressedImage.complete();
-          })
-          .catch(err => compressedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err}));
-
-      })
-      .catch(err => {
-        imageCompression(file, {
-          maxSizeMB: sizeInMB,
-          alwaysKeepResolution: true,
-          maxIteration: this.MAX_STEPS
-        })
-          .then(compressedFile => {
-            compressedImage.next(compressedFile);
-            compressedImage.complete();
-          })
-          .catch(err => compressedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err}));
-      });
 
     return compressedImage.asObservable();
   }
