@@ -6,6 +6,7 @@ import Compressor from 'compressorjs';
 
 @Injectable()
 export class NgxPicaService {
+  private MAX_STEPS = 20;
 
   public resizeImages(files: File[], width: number, height: number): Observable<File> {
     const resizedImage: Subject<File> = new Subject();
@@ -133,34 +134,64 @@ export class NgxPicaService {
   public compressImage(file: File, sizeInMB: number): Observable<File> {
     const compressedImage: Subject<File> = new Subject();
 
-    if (this.bytesToMB(file.size) <= sizeInMB) {
-      setTimeout(() => {
-        compressedImage.next(file);
+    this.getCompressedImage(file, 1, sizeInMB, 0)
+      .then(imgCompressed => {
+        compressedImage.next(imgCompressed);
         compressedImage.complete();
+      })
+      .catch(err => {
+        compressedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err});
       });
-    } else {
+
+    return compressedImage.asObservable();
+  }
+
+  private getCompressedImage(file: File, quality: number, sizeInMB: number, step: number): Promise<File> {
+    return new Promise<File>((resolve, reject) => {
+      console.log(file.size);
       new Compressor(file, {
-        convertTypes: [],
-        convertSize: sizeInMB,
-        success(result) {
+        quality: quality,
+        success: (result) => {
           let compressedFile: File;
 
-          if (!(result instanceof File)) {
-            compressedFile = new File([result], file.name, {type: file.type,});
+          if (result instanceof Blob) {
+            compressedFile = new File([result], file.name, {type: file.type});
           } else {
             compressedFile = result;
           }
 
-          compressedImage.next(compressedFile);
-          compressedImage.complete();
+          this.checkCompressedImageSize(compressedFile, quality, sizeInMB, step)
+            .then((compressedImage: File) => {
+                resolve(compressedImage);
+              }
+            )
+            .catch((err) => reject(err));
         },
-        error(err) {
-          compressedImage.error({err: NgxPicaErrorType.READ_ERROR, file: file, original_error: err});
+        error: (err) => {
+          reject(err);
         },
       });
-    }
+    });
+  }
 
-    return compressedImage.asObservable();
+  private checkCompressedImageSize(
+    file: File,
+    quality: number,
+    sizeInMB: number,
+    step: number
+  ): Promise<File> {
+    return new Promise<File>((resolve, reject) => {
+      if (step > this.MAX_STEPS) {
+        reject(NgxPicaErrorType.NOT_BE_ABLE_TO_COMPRESS_ENOUGH);
+      } else if (this.bytesToMB(file.size) <= sizeInMB) {
+        resolve(file);
+      } else {
+        const newQuality: number = quality - 0.5;
+        const newStep: number = step + 1;
+
+        resolve(this.getCompressedImage(file, newQuality, sizeInMB, newStep));
+      }
+    });
   }
 
   private bytesToMB(bytes: number) {
