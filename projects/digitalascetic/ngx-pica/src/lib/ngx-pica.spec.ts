@@ -92,7 +92,7 @@ describe('ngx-pica tests', () => {
             next: (imageResized: File) => {
               const reader: FileReader = new FileReader();
 
-              expect(imageResized.size).toBe(917753);
+              expect(imageResized.size).toBe(1962203);
 
               reader.addEventListener('load', (event: any) => {
                 const img = new Image();

@@ -19,6 +19,7 @@
     "@angular/platform-browser": "^18.2.0",
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
+    "browser-image-compression": "^2.0.2",
     "compressorjs": "^1.2.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
