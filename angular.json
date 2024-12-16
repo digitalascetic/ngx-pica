@@ -12,7 +12,6 @@
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "tsConfig": "projects/digitalascetic/ngx-pica/tsconfig.lib.json",
             "project": "projects/digitalascetic/ngx-pica/ng-package.json"
           },
           "configurations": {
@@ -28,9 +27,11 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/digitalascetic/ngx-pica/src/test.ts",
             "tsConfig": "projects/digitalascetic/ngx-pica/tsconfig.spec.json",
-            "karmaConfig": "projects/digitalascetic/ngx-pica/karma.conf.js"
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
           }
         }
       }
