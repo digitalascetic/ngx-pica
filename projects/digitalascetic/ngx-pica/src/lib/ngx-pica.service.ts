@@ -8,7 +8,7 @@ import imageCompression from 'browser-image-compression';
 export class NgxPicaService {
   private MAX_STEPS = 20;
 
-  public resizeImages(files: File[], width: number, height: number): Observable<File> {
+  public resizeImages(files: File[], width: number, height: number, useWebWorker?: boolean): Observable<File> {
     const resizedImage: Subject<File> = new Subject();
     const totalFiles: number = files.length;
 
@@ -18,7 +18,7 @@ export class NgxPicaService {
 
       const subscription: Subscription = nextFile
         .pipe(
-          switchMap((file: File) => this.resizeImage(file, width, height))
+          switchMap((file: File) => this.resizeImage(file, width, height, useWebWorker))
         )
         .subscribe({
           next: imageResized => {
@@ -56,7 +56,7 @@ export class NgxPicaService {
     return resizedImage.asObservable();
   }
 
-  public resizeImage(file: File, width: number, height: number): Observable<File> {
+  public resizeImage(file: File, width: number, height: number, useWebWorker: boolean = true): Observable<File> {
     const resizedImage: Subject<File> = new Subject();
 
     const maxWidthOrHeight = width > height ? height : width;
@@ -66,6 +66,7 @@ export class NgxPicaService {
         imageCompression(file, {
           maxWidthOrHeight: maxWidthOrHeight,
           exifOrientation: orientation,
+          useWebWorker: useWebWorker,
           maxIteration: this.MAX_STEPS
         }).then(resizedFile => {
           resizedImage.next(resizedFile);
@@ -86,7 +87,7 @@ export class NgxPicaService {
     return resizedImage.asObservable();
   }
 
-  public compressImages(files: File[], sizeInMB: number): Observable<File> {
+  public compressImages(files: File[], sizeInMB: number, useWebWorker?: boolean): Observable<File> {
     const compressedImage: Subject<File> = new Subject();
     const totalFiles: number = files.length;
 
@@ -96,7 +97,7 @@ export class NgxPicaService {
 
       const subscription: Subscription = nextFile
         .pipe(
-          switchMap((file: File) => this.compressImage(file, sizeInMB))
+          switchMap((file: File) => this.compressImage(file, sizeInMB, useWebWorker))
         )
         .subscribe({
           next: imageCompressed => {
@@ -134,7 +135,7 @@ export class NgxPicaService {
     return compressedImage.asObservable();
   }
 
-  public compressImage(file: File, sizeInMB: number): Observable<File> {
+  public compressImage(file: File, sizeInMB: number, useWebWorker: boolean = true): Observable<File> {
     const compressedImage: Subject<File> = new Subject();
 
     if (this.bytesToMB(file.size) <= sizeInMB) {
@@ -147,6 +148,7 @@ export class NgxPicaService {
         .then(orientation => {
           imageCompression(file, {
             maxSizeMB: sizeInMB,
+            useWebWorker: useWebWorker,
             exifOrientation: orientation,
             alwaysKeepResolution: true,
             maxIteration: this.MAX_STEPS

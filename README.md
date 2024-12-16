@@ -39,40 +39,33 @@ export class AppModule {}
 * **NgxPicaImageService** - Supplementary services to help you work with images
 
 ## NgxPicaService Methods
-#### `.resizeImages(files: File[], width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File>`
+#### `.resizeImages(files: File[], width: number, height: number, useWebWorker?: boolean): Observable<File>`
 This method resize an array of images doing it sequentially to optimize CPU and memory use.
 * **files:[]** - Array of images to resize
 * **width** - Width to be resized (px)
 * **height** - Height to be resized (px)
-* **options** - Based on <a href="https://github.com/nodeca/pica#resizefrom-to-options---promise">pica - resize options</a>, we've also added exif and aspect ratio options:
-    * **exifOptions**:    
-        * **forceExifOrientation** - [default: true] Set false to avoid image orientation from Exif info.
-    * **aspectRatio**:     
-        * **keepAspectRatio** - Set true to ensure the aspect ratio of the image is maintained as it get resized
-        * **forceMinDimensions** - Set true to ensure the dimensions of image resized will be greater than width and height values defined
+* **useWebWorker** - optional, use multi-thread web worker, fallback to run in main-thread (default: true)
 
 The Observable receives a next on every file that has been resized.
 If something goes wrong the Observable receive an error.
 
 All errors are wrapped by NgxPicaErrorInterface.
 
-### `.resizeImage(file: File, width: number, height: number, options?: NgxPicaResizeOptionsInterface): Observable<File>`
+### `.resizeImage(file: File, width: number, height: number, useWebWorker: boolean = true): Observable<File>`
 Same as above but only takes one file instead of an array of files.
 
-### `.compressImages(files: File[], sizeInMB: number, options?: NgxPicaCompressOptionsInterface): Observable<File>`
+### `.compressImages(files: File[], sizeInMB: number, useWebWorker?: boolean): Observable<File>`
 This method compress an array of images doing it sequentially to optimize CPU and memory use.
 * **files:[]** - Array of images to resize
 * **sizeInMB** - File size in MegaBytes
-* **options** - Same as resize options, but only for exif orientation:
-    * **exifOptions**:    
-        * **forceExifOrientation** - [default: true] Set false to avoid image orientation from Exif info.
+* **useWebWorker** - optional, use multi-thread web worker, fallback to run in main-thread (default: true)
 
 The Observable receives a next on every file that has been resized.
 If something goes wrong the Observable receive an error.
 
 All errors are wrapped by NgxPicaErrorInterface.
 
-### `.compressImage(file: File, sizeInMB: number, options?: NgxPicaCompressOptionsInterface): Observable<File>`
+### `.compressImage(file: File, sizeInMB: number, useWebWorker: boolean = true): Observable<File>`
 Same as above but only takes one file instead of an array of files.
 
 ## NgxPicaImageService Methods
@@ -80,37 +73,6 @@ Same as above but only takes one file instead of an array of files.
 This method check if a file is an image or not
 
 ## Data Structures
-```
-export interface ExifOptions {
-  forceExifOrientation: boolean;
-}
-```
-
-```
-export interface AspectRatioOptions {
-    keepAspectRatio: boolean;
-    forceDimensions?: boolean;
-}
-```
-
-```
-export interface NgxPicaResizeOptionsInterface {
-    exifOptions: ExifOptions;
-    aspectRatio?: AspectRatioOptions;
-    quality?: number;
-    alpha?: boolean;
-    unsharpAmount?: number;
-    unsharpRadius?: number;
-    unsharpThreshold?: number;
-}
-```
-
-```
-export interface NgxPicaCompressOptionsInterface {
-  exifOptions: ExifOptions;
-}
-```
-
 ```
 export enum NgxPicaErrorType {
     NO_FILES_RECEIVED = 'NO_FILES_RECEIVED',
