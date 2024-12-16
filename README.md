@@ -6,7 +6,7 @@
 ## Important
 @digitalascetic/ngx-pica Angular 5 compatibility is under version **1.1.8**  
 ```bash
-$ npm install @digitalascetic/ngx-pica@1.1.8 --save
+$ npm install @digitalascetic/ngx-pica@20.1.3 --save
 ```
 
 ## Install
